@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/sign_in_page"
+    >
+    <fragment
+        android:id="@+id/register_page"
+        android:name="com.mdev1008.nutriscanandroiddev.pages.authpages.RegisterPage"
+        android:label="RegisterPage"
+        tools:layout="@layout/fragment_register_page">
+    </fragment>
+    <fragment
+        android:id="@+id/sign_in_page"
+        android:name="com.mdev1008.nutriscanandroiddev.pages.authpages.SignInPage"
+        android:label="SignInPage"
+        tools:layout="@layout/fragment_sign_in_page" >
+        <action
+            android:id="@+id/action_sign_in_page_to_register_page"
+            app:destination="@id/register_page" />
+        <action
+            android:id="@+id/action_sign_in_page_to_home_page"
+            app:destination="@id/home_page" />
+        <action
+            android:id="@+id/action_sign_in_page_to_profile_page"
+            app:destination="@id/profile_page" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/home_page"
+        android:name="com.mdev1008.nutriscanandroiddev.pages.homepage.HomePage"
+        android:label="HomePage"
+        tools:layout="@layout/fragment_home_page">
+        <action
+            android:id="@+id/action_home_page_to_sign_in_page"
+            app:destination="@id/sign_in_page" />
+        <action
+            android:id="@+id/action_home_page_to_product_details_page"
+            app:destination="@id/product_details_page" />
+        <action
+            android:id="@+id/action_home_page_to_profile_page"
+            app:destination="@id/profile_page" />
+    </fragment>
+    <fragment
+        android:id="@+id/profile_page"
+        android:name="com.mdev1008.nutriscanandroiddev.pages.profilepage.ProfilePage"
+        android:label="ProfilePage"
+        tools:layout="@layout/fragment_profile_page">
+        <action
+            android:id="@+id/action_profile_page_to_home_page"
+            app:destination="@id/home_page"
+            />
+    </fragment>
+
+    <fragment
+        android:id="@+id/product_details_page"
+        android:name="com.mdev1008.nutriscanandroiddev.pages.productdetailspage.ProductDetailsPage"
+        android:label="ProductDetailsPage"
+        tools:layout="@layout/fragment_product_details_page">
+    </fragment>
+
+</navigation>
