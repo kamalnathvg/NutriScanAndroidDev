@@ -21,6 +21,7 @@ import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.mdev1008.nutriscanandroiddev.NutriScanApplication
 import com.mdev1008.nutriscanandroiddev.R
@@ -51,6 +52,8 @@ import com.mdev1008.nutriscanandroiddev.utils.isValidUserName
 import com.mdev1008.nutriscanandroiddev.utils.logger
 import com.mdev1008.nutriscanandroiddev.utils.show
 import com.mdev1008.nutriscanandroiddev.utils.showSnackBar
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.log
 
 class ProfilePage : Fragment() {
@@ -145,7 +148,10 @@ class ProfilePage : Fragment() {
                         userAllergen = allergens
                     )
                     viewModel.emit(HomePageEvent.UpdateUserDetails(userProfileDetails))
-                    findNavController().popBackStack()
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        delay(500)
+                        findNavController().popBackStack()
+                    }
                 }
             }else{
                 view?.showSnackBar(userName.isValidUserName().second)

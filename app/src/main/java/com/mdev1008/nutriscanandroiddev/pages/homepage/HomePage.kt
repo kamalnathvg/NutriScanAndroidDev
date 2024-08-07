@@ -50,8 +50,9 @@ class HomePage : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.emit(HomePageEvent.GetUserDetails)
-        setupMenuOptions()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.emit(HomePageEvent.GetUserDetails)
+        }
         setupScanButton()
         setupDemoItemButton()
         setupRecyclerView()
@@ -101,6 +102,7 @@ class HomePage : Fragment() {
                     UserDetailsFetchState.NOT_STARTED -> {
 
                         activity?.hideProgressBar()
+                        setupMenuOptions()
                         logger(state.userDetailsFetchState.name)
                         logger(state.user?.isProfileCompleted.toString())
                         if (state.user == null){

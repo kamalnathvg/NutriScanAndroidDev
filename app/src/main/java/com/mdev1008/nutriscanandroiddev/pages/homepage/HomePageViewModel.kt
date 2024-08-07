@@ -18,6 +18,7 @@ import com.mdev1008.nutriscanandroiddev.utils.Resource
 import com.mdev1008.nutriscanandroiddev.utils.logger
 import getNutrientsForView
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -163,6 +164,7 @@ class HomePageViewModel(
             is HomePageEvent.UpdateUserDetails ->{
                 viewModelScope.launch(Dispatchers.IO) {
                     dbRepository.upsertUserProfileDetails(event.userDetails)
+                    delay(500)
                 }
                 event.userDetails.apply {
                     _uiState.update {
@@ -243,6 +245,7 @@ class HomePageViewModel(
             itemToAdd?.let {
                 dbRepository.addItemToSearchHistory(it)
             }
+            delay(500)
         }
         updateSearchHistory()
     }
