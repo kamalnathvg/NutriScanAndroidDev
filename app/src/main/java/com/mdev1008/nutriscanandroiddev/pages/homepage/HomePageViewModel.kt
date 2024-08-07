@@ -174,6 +174,8 @@ class HomePageViewModel(
                         )
                     }
                 }
+                getUserDetails()
+
             }
             HomePageEvent.GetUserDetails -> getUserDetails()
             HomePageEvent.SkipProfilePage -> skipUserProfileSetup()
@@ -186,7 +188,6 @@ class HomePageViewModel(
                 dbRepository.skipUserProfileSetup()
             }
         }catch (e: Exception){
-            getUserDetails()
         }
 
 

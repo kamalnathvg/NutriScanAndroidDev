@@ -51,6 +51,7 @@ class HomePage : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.emit(HomePageEvent.GetUserDetails)
+        setupMenuOptions()
         setupScanButton()
         setupDemoItemButton()
         setupRecyclerView()
@@ -93,7 +94,6 @@ class HomePage : Fragment() {
                     UserDetailsFetchState.SUCCESS -> {
                         logger(state.userDetailsFetchState.name)
                         updateSearchHistory(state.searchHistory)
-                        setupMenuOptions()
                     }
                     UserDetailsFetchState.FAILURE -> {
                         logger(state.userDetailsFetchState.name)
