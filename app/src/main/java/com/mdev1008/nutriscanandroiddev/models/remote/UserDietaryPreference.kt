@@ -70,7 +70,7 @@ fun MutableList<UserDietaryPreference>.upsertPreference(userId: Int,nutrientType
     return this
 }
 
-fun MutableList<UserDietaryPreference>.getDietaryPreferenceConclusion(productNutrients: List<NutrientForView>): String {
+fun MutableList<UserDietaryPreference>.getConclusion(productNutrients: List<NutrientForView>): String {
     val filteredUserPreference = this.filter {
         it.nutrientPreference != null
     }

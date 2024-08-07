@@ -1,5 +1,7 @@
 package com.mdev1008.nutriscanandroiddev.utils
 
+import java.text.DecimalFormat
+
 class AppResources {
     companion object{
 
@@ -240,10 +242,20 @@ object DemoItems{
         BHUJJIA,
         SEASONED_PEANUTS,
         ALOO_LACHHA,
-        COCA_COLA_CAN
+        COCA_COLA_CAN,
+        "20724696",
+        "3046920028004",
+        "3168930009078",
+        "87157277",
+        "7622300489434",
     )
 
     fun getRandomItem(): String{
         return items.random()
     }
+}
+
+fun Double.formatForView(): Double{
+    val decimalFormat = DecimalFormat("#.0")
+    return decimalFormat.format(this).toDouble()
 }

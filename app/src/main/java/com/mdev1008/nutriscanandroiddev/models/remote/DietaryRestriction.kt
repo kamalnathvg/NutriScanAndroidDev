@@ -27,3 +27,35 @@ fun dietaryRestrictionForProfilePage(): List<DietaryRestriction>{
     )
 }
 
+fun DietaryRestriction.isVeganRestriction(): Boolean{
+    val restrictions = mutableListOf(
+        DietaryRestriction.VEGAN,
+        DietaryRestriction.NON_VEGAN,
+        DietaryRestriction.VEGAN_STATUS_UNKNOWN
+    )
+    return this in restrictions
+}
+
+fun DietaryRestriction.isVegetarianRestriction(): Boolean{
+    val restrictions = mutableListOf(
+        DietaryRestriction.VEGETARIAN,
+        DietaryRestriction.NON_VEGETARIAN,
+        DietaryRestriction.VEGETARIAN_STATUS_UNKNOWN
+    )
+    return this in restrictions
+}
+
+fun DietaryRestriction.isPalmOilRestriction(): Boolean{
+    val restrictions = mutableListOf(
+        DietaryRestriction.PALM_OIL,
+        DietaryRestriction.PALM_OIL_FREE,
+        DietaryRestriction.PALM_OIL_STATUS_UNKNOWN
+    )
+    return this in restrictions
+}
+
+fun DietaryRestriction.isSameCategory(dietaryRestriction: DietaryRestriction): Boolean{
+    return (this.isVeganRestriction() && dietaryRestriction.isVeganRestriction())
+            || (this.isVegetarianRestriction() && dietaryRestriction.isVegetarianRestriction())
+            || (this.isPalmOilRestriction() && dietaryRestriction.isPalmOilRestriction())
+}

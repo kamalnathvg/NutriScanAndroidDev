@@ -2,6 +2,7 @@ package com.mdev1008.nutriscanandroiddev.models.data
 
 import Nutrients
 import com.mdev1008.nutriscanandroiddev.models.remote.NutriScoreData
+import com.mdev1008.nutriscanandroiddev.utils.formatForView
 
 enum class NutrientType(val description: String, val heading: String) {
     ENERGY ("energy","Calories"),
@@ -49,78 +50,7 @@ fun NutrientType.getNutrientCategory(pointsLevel: PointsLevel): NutrientCategory
 }
 
 fun NutrientType.getDescription(pointsLevel: PointsLevel): String{
-    return when(this){//TODO: write proper description for each nutrient.
-        NutrientType.ENERGY -> {
-            when(pointsLevel){
-                PointsLevel.TOO_LOW -> "not caloric"
-                PointsLevel.LOW -> "not too caloric"
-                PointsLevel.MODERATE -> "slightly"
-                PointsLevel.HIGH -> "caloric"
-                PointsLevel.TOO_HIGH -> "too caloric"
-                PointsLevel.UNKNOWN -> "unknown"
-            }
-        }
-        NutrientType.PROTEIN -> {
-            when(pointsLevel){
-                PointsLevel.TOO_LOW -> "not caloric"
-                PointsLevel.LOW -> "not too caloric"
-                PointsLevel.MODERATE -> "slightly"
-                PointsLevel.HIGH -> "caloric"
-                PointsLevel.TOO_HIGH -> "too caloric"
-                PointsLevel.UNKNOWN -> "unknown"
-            }
-        }
-        NutrientType.SATURATES -> {
-            when(pointsLevel){
-                PointsLevel.TOO_LOW -> "not caloric"
-                PointsLevel.LOW -> "not too caloric"
-                PointsLevel.MODERATE -> "slightly"
-                PointsLevel.HIGH -> "caloric"
-                PointsLevel.TOO_HIGH -> "too caloric"
-                PointsLevel.UNKNOWN -> "unknown"
-            }
-        }
-        NutrientType.SUGAR -> {
-            when(pointsLevel){
-                PointsLevel.TOO_LOW -> "not caloric"
-                PointsLevel.LOW -> "not too caloric"
-                PointsLevel.MODERATE -> "slightly"
-                PointsLevel.HIGH -> "caloric"
-                PointsLevel.TOO_HIGH -> "too caloric"
-                PointsLevel.UNKNOWN -> "unknown"
-            }
-        }
-        NutrientType.FIBRE -> {
-            when(pointsLevel){
-                PointsLevel.TOO_LOW -> "not caloric"
-                PointsLevel.LOW -> "not too caloric"
-                PointsLevel.MODERATE -> "slightly"
-                PointsLevel.HIGH -> "caloric"
-                PointsLevel.TOO_HIGH -> "too caloric"
-                PointsLevel.UNKNOWN -> "unknown"
-            }
-        }
-        NutrientType.SODIUM -> {
-            when(pointsLevel){
-                PointsLevel.TOO_LOW -> "not caloric"
-                PointsLevel.LOW -> "not too caloric"
-                PointsLevel.MODERATE -> "slightly"
-                PointsLevel.HIGH -> "caloric"
-                PointsLevel.TOO_HIGH -> "too caloric"
-                PointsLevel.UNKNOWN -> "unknown"
-            }
-        }
-        NutrientType.FRUITS_VEGETABLES_AND_NUTS -> {
-            when(pointsLevel){
-                PointsLevel.TOO_LOW -> "not caloric"
-                PointsLevel.LOW -> "not too caloric"
-                PointsLevel.MODERATE -> "slightly"
-                PointsLevel.HIGH -> "caloric"
-                PointsLevel.TOO_HIGH -> "too caloric"
-                PointsLevel.UNKNOWN -> "unknown"
-            }
-        }
-    }
+    return "${pointsLevel.description} ${this.heading}"
 }
 
 fun NutrientType.getContentPerHundredGram(nutrients: Nutrients): Number{
@@ -131,7 +61,7 @@ fun NutrientType.getContentPerHundredGram(nutrients: Nutrients): Number{
         NutrientType.SUGAR -> nutrients.sugars100g ?: 0
         NutrientType.FIBRE -> nutrients.fiber100g ?: 0
         NutrientType.SODIUM -> nutrients.sodium100g ?: 0
-        NutrientType.FRUITS_VEGETABLES_AND_NUTS -> nutrients.fruitsVegetablesNutsEstimateFromIngredients100g ?: 0
+        NutrientType.FRUITS_VEGETABLES_AND_NUTS -> nutrients.fruitsVegetablesNutsEstimateFromIngredients100g?.formatForView() ?: 0
     }
 }
 

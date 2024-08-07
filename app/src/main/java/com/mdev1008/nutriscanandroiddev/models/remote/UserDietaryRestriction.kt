@@ -39,11 +39,15 @@ fun MutableList<UserDietaryRestriction>.getConclusion(productRestrictions: List<
     else if(this.isEmpty()) return ""
 
     val commonRestrictions = mutableListOf<DietaryRestriction>()
-    productRestrictions.forEach { restriction ->
-        if (this.containsRestriction(restriction)){
-            commonRestrictions.add(restriction)
+
+    this.forEach {userDietaryRestriction ->
+        productRestrictions.forEach { productRestriction ->
+           if (userDietaryRestriction.dietaryRestriction.isSameCategory(productRestriction)){
+               commonRestrictions.add(productRestriction)
+           }
         }
     }
+
     return commonRestrictions.joinToString(", "){
         it.conclusionString
     }

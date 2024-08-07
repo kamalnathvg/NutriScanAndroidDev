@@ -1,5 +1,6 @@
 package com.mdev1008.nutriscanandroiddev.pages.homepage
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -80,6 +81,7 @@ class SearchHistoryAdapter(
                 ))
         }
     }
+    @SuppressLint("NotifyDataSetChanged")
     fun updateData(newList: List<SearchHistoryItem>){
         this.searchHistoryItems = newList
         notifyDataSetChanged()

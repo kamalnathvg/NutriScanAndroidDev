@@ -11,7 +11,6 @@ import com.mdev1008.nutriscanandroiddev.models.remote.UserAllergen
 import com.mdev1008.nutriscanandroiddev.models.remote.UserDietaryPreference
 import com.mdev1008.nutriscanandroiddev.models.remote.UserDietaryRestriction
 import com.mdev1008.nutriscanandroiddev.models.remote.getConclusion
-import com.mdev1008.nutriscanandroiddev.models.remote.getDietaryPreferenceConclusion
 import com.mdev1008.nutriscanandroiddev.models.remote.toAllergens
 import com.mdev1008.nutriscanandroiddev.repositories.ApiRepository
 import com.mdev1008.nutriscanandroiddev.repositories.DbRepository
@@ -198,7 +197,7 @@ class HomePageViewModel(
         val state = uiState.value
         val dietaryPreferenceConclusion = state.dietaryPreferences
             .toMutableList()
-            .getDietaryPreferenceConclusion(product.getNutrientsForView())
+            .getConclusion(product.getNutrientsForView())
         val dietaryRestrictionConclusion = state.dietaryRestriction
             .toMutableList()
             .getConclusion(product.dietaryRestrictions?.toDietaryRestrictions())

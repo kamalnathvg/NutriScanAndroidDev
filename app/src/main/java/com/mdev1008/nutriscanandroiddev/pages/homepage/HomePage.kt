@@ -69,12 +69,15 @@ class HomePage : Fragment() {
             viewModel.uiState.collect{state ->
                 when(state.productDetailsFetchState){
                     ProductDetailsFetchState.LOADING -> {
+                        logger(state.productDetailsFetchState.name)
                         activity?.showProgressBar()
                     }
                     ProductDetailsFetchState.SUCCESS -> {
+                        logger(state.productDetailsFetchState.name)
                         findNavController().navigate(R.id.action_home_page_to_product_details_page)
                     }
                     ProductDetailsFetchState.FAILURE -> {
+                        logger(state.productDetailsFetchState.name)
                         view?.showSnackBar(state.message.toString())
                     }
                     ProductDetailsFetchState.NOT_STARTED -> {
