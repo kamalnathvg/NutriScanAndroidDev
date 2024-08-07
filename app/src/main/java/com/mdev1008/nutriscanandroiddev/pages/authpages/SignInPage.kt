@@ -15,6 +15,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.mdev1008.nutriscanandroiddev.NutriScanApplication
 import com.mdev1008.nutriscanandroiddev.R
 import com.mdev1008.nutriscanandroiddev.databinding.FragmentSignInPageBinding
+import com.mdev1008.nutriscanandroiddev.pages.homepage.HomePageEvent
+import com.mdev1008.nutriscanandroiddev.pages.homepage.HomePageViewModel
+import com.mdev1008.nutriscanandroiddev.pages.homepage.HomePageViewModelFactory
 import com.mdev1008.nutriscanandroiddev.utils.hideKeyboard
 import com.mdev1008.nutriscanandroiddev.utils.isValidPassword
 import com.mdev1008.nutriscanandroiddev.utils.isValidUserName
@@ -27,6 +30,13 @@ class SignInPage : Fragment() {
 
     private val viewModel: AuthViewModel by activityViewModels<AuthViewModel> {
         AuthViewModelFactory((requireActivity().application as NutriScanApplication).dbRepository)
+    }
+    private val homepageViewModel by activityViewModels<HomePageViewModel> {
+        val nutriScanApplication = requireActivity().application as NutriScanApplication
+        HomePageViewModelFactory(
+            apiRepository = nutriScanApplication.apiRepository,
+            dbRepository = nutriScanApplication.dbRepository
+        )
     }
     private lateinit var viewBinding: FragmentSignInPageBinding
     override fun onCreateView(
@@ -70,6 +80,7 @@ class SignInPage : Fragment() {
                         logger(state.signInState.name)
                         view.showSnackBar(state.message, Snackbar.LENGTH_LONG)
 //                        findNavController().navigate(R.id.action_sign_in_page_to_home_page)
+                        homepageViewModel.emit(HomePageEvent.GetUserDetails)
                         findNavController().popBackStack()
                     }
                     SignInState.FAILURE -> {

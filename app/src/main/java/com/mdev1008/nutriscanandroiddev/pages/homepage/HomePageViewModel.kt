@@ -162,10 +162,6 @@ class HomePageViewModel(
             }
 
             is HomePageEvent.UpdateUserDetails ->{
-                viewModelScope.launch(Dispatchers.IO) {
-                    dbRepository.upsertUserProfileDetails(event.userDetails)
-                    delay(500)
-                }
                 event.userDetails.apply {
                     _uiState.update {
                         it.copy(
@@ -175,8 +171,13 @@ class HomePageViewModel(
                             allergens = this.userAllergen
                         )
                     }
+                viewModelScope.launch(Dispatchers.IO) {
+                    dbRepository.upsertUserProfileDetails(event.userDetails)
+                    delay(500)
+                    }
                 }
-                getUserDetails()
+
+//                getUserDetails()
 
             }
             HomePageEvent.GetUserDetails -> getUserDetails()
@@ -226,7 +227,7 @@ class HomePageViewModel(
         return null
     }
 
-    private suspend fun upsertItemToSearchHistory(product: Product?) {
+    private fun upsertItemToSearchHistory(product: Product?) {
 
         if (product == null) return
         val itemInSearchHistory = checkIfItemInSearchHistory(product.productId)
@@ -240,7 +241,7 @@ class HomePageViewModel(
                 itemToAdd = product.toSearchHistoryItem(userId)
             }
         }
-        withContext(Dispatchers.IO){
+        viewModelScope.launch(Dispatchers.IO){
             logger("adding item with itemId: ${itemToAdd?.id}")
             itemToAdd?.let {
                 dbRepository.addItemToSearchHistory(it)
@@ -249,7 +250,7 @@ class HomePageViewModel(
         }
         updateSearchHistory()
     }
-    private suspend fun updateSearchHistory(){
+    private fun updateSearchHistory(){
         viewModelScope.launch {
             var updatedSearchHistory: List<SearchHistoryItem>
             withContext(Dispatchers.IO){

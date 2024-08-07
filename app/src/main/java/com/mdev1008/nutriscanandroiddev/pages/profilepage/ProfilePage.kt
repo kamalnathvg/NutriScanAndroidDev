@@ -149,7 +149,7 @@ class ProfilePage : Fragment() {
                     )
                     viewModel.emit(HomePageEvent.UpdateUserDetails(userProfileDetails))
                     viewLifecycleOwner.lifecycleScope.launch {
-                        delay(500)
+                        delay(1000)
                         findNavController().popBackStack()
                     }
                 }
