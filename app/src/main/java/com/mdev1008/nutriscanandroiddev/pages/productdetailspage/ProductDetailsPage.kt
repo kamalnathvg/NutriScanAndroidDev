@@ -3,12 +3,16 @@ package com.mdev1008.nutriscanandroiddev.pages.productdetailspage
 import Product
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.compose.ui.text.style.TextAlign
+import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -27,6 +31,7 @@ import com.mdev1008.nutriscanandroiddev.utils.getIconAndBg
 import com.mdev1008.nutriscanandroiddev.utils.loadFromUrlOrGone
 import getMainDetailsForView
 import com.mdev1008.nutriscanandroiddev.utils.logger
+import com.mdev1008.nutriscanandroiddev.utils.show
 import getNutrientsForView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -84,9 +89,15 @@ class ProductDetailsPage : Fragment() {
             }
 
             if (positiveNutrients.isEmpty() && negativeNutrients.isEmpty()){
-
+                buildNoDetailsAvailableView()
             }
         }
+    }
+
+    private fun buildNoDetailsAvailableView() {
+        val itemView = LayoutInflater.from(requireContext()).inflate(R.layout.component_no_details_text_view, viewBindingLayout.llProductDetailsLayout, false)
+        itemView.findViewById<TextView>(R.id.tv_no_details).text = getString(R.string.no_nutrient_details_available_for_the_product)
+        viewBindingLayout.llProductDetailsLayout.addView(itemView)
     }
 
     private fun buildNutrientsView(nutrients: List<NutrientForView>, nutrientCategory: NutrientCategory) {

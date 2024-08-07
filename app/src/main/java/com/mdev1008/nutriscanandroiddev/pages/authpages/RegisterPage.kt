@@ -18,6 +18,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.mdev1008.nutriscanandroiddev.NutriScanApplication
 import com.mdev1008.nutriscanandroiddev.R
 import com.mdev1008.nutriscanandroiddev.databinding.FragmentRegisterPageBinding
+import com.mdev1008.nutriscanandroiddev.utils.hideKeyboard
 import com.mdev1008.nutriscanandroiddev.utils.isValidPassword
 import com.mdev1008.nutriscanandroiddev.utils.isValidUserName
 import com.mdev1008.nutriscanandroiddev.utils.showSnackBar
@@ -54,6 +55,7 @@ class RegisterPage : Fragment() {
         }
 
         viewBinding.btnRegister.setOnClickListener {
+            view.hideKeyboard()
             viewBinding.apply {
                 tilRegisterUsername.error = null
                 tilRegisterPassword.error = null

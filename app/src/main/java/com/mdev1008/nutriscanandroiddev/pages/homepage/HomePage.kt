@@ -22,7 +22,10 @@ import com.mdev1008.nutriscanandroiddev.models.data.SearchHistoryItem
 import com.mdev1008.nutriscanandroiddev.utils.BarcodeScanner
 import com.mdev1008.nutriscanandroiddev.utils.DemoItems
 import com.mdev1008.nutriscanandroiddev.utils.Resource
+import com.mdev1008.nutriscanandroiddev.utils.greet
+import com.mdev1008.nutriscanandroiddev.utils.hideProgressBar
 import com.mdev1008.nutriscanandroiddev.utils.logger
+import com.mdev1008.nutriscanandroiddev.utils.showProgressBar
 import com.mdev1008.nutriscanandroiddev.utils.showSnackBar
 import kotlinx.coroutines.launch
 
@@ -55,6 +58,7 @@ class HomePage : Fragment() {
     }
 
     private fun setupDemoItemButton(){
+        activity?.showProgressBar()
         viewBinding.fabGetDemoItem.setOnClickListener {
             viewModel.emit(HomePageEvent.FetchProductDetails(DemoItems.getRandomItem()))
         }
@@ -64,46 +68,71 @@ class HomePage : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState.collect{state ->
                 when(state.productDetailsFetchState){
-                    ProductDetailsFetchState.LOADING -> {}
+                    ProductDetailsFetchState.LOADING -> {
+                        activity?.showProgressBar()
+                    }
                     ProductDetailsFetchState.SUCCESS -> {
                         findNavController().navigate(R.id.action_home_page_to_product_details_page)
                     }
                     ProductDetailsFetchState.FAILURE -> {
                         view?.showSnackBar(state.message.toString())
                     }
-                    ProductDetailsFetchState.NOT_STARTED -> {}
+                    ProductDetailsFetchState.NOT_STARTED -> {
+                        activity?.hideProgressBar()
+                    }
                 }
 
                 when(state.userDetailsFetchState){
-                    UserDetailsFetchState.LOADING -> {}
+                    UserDetailsFetchState.LOADING -> {
+                        logger(state.userDetailsFetchState.name)
+                        activity?.showProgressBar()
+                    }
                     UserDetailsFetchState.SUCCESS -> {
+                        logger(state.userDetailsFetchState.name)
                         updateSearchHistory(state.searchHistory)
                         setupMenuOptions()
                     }
-                    UserDetailsFetchState.FAILURE -> {}
+                    UserDetailsFetchState.FAILURE -> {
+                        logger(state.userDetailsFetchState.name)
+                    }
                     UserDetailsFetchState.NOT_STARTED -> {
+
+                        activity?.hideProgressBar()
+                        logger(state.userDetailsFetchState.name)
+                        logger(state.user?.isProfileCompleted.toString())
                         if (state.user == null){
                             findNavController().navigate(R.id.action_home_page_to_sign_in_page)
                         }
+                        if (state.user?.isProfileCompleted == false){
+                            findNavController().navigate(R.id.action_home_page_to_profile_page)
+                        }
                     }
                 }
+
             }
         }
     }
 
     private fun setupRecyclerView() {
+        logger("building recycler view")
         val searchHistory = viewModel.uiState.value.searchHistory
-        val searchHistoryAdapter = SearchHistoryAdapter(viewModel, searchHistory)
+        val searchHistoryAdapter = SearchHistoryAdapter(
+            viewModel,
+            searchHistory,
+            onShowProgress = activity?.showProgressBar(),
+            onHideProgress = activity?.hideProgressBar()
+        )
         viewBinding.rvSearchHistory.layoutManager = LinearLayoutManager(requireContext())
         viewBinding.rvSearchHistory.adapter = searchHistoryAdapter
     }
     private fun updateSearchHistory(searchHistory: List<SearchHistoryItem>){
+        logger("updating search history")
         val adapter = viewBinding.rvSearchHistory.adapter as SearchHistoryAdapter
         adapter.updateData(searchHistory)
     }
 
     private fun setupScanButton(){
-        viewBinding.fabScanProduct.setOnClickListener {
+        viewBinding.fabScanProduct.setOnClickListener { scanButton ->
             BarcodeScanner.startScan(requireContext()){result ->
                 when(result){
                     is Resource.Success -> {
@@ -122,13 +151,14 @@ class HomePage : Fragment() {
     }
 
     private fun setupMenuOptions() {
+        val userName = viewModel.uiState.value.user?.userName
         val appCompatActivity = activity as AppCompatActivity
         viewBinding.mtbHomePage.let { materialToolbar ->
             appCompatActivity.setSupportActionBar(materialToolbar)
-            materialToolbar.title = viewModel.uiState.value.user?.userName
+            materialToolbar.title = userName?.greet()
             materialToolbar.setTitleTextColor(Color.WHITE)
         }
-        logger("Building HomePage Menu")
+        logger("building HomePage Menu")
         appCompatActivity.addMenuProvider(object :MenuProvider{
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.homepage_menu,menu)

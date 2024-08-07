@@ -91,3 +91,7 @@ fun String.isValidProductId(): Boolean {
     }
     return result.isEmpty()
 }
+
+fun String.greet(): String{
+    return "Hi $this"
+}

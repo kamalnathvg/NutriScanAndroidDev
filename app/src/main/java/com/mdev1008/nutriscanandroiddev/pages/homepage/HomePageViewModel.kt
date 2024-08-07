@@ -177,7 +177,20 @@ class HomePageViewModel(
                 }
             }
             HomePageEvent.GetUserDetails -> getUserDetails()
+            HomePageEvent.SkipProfilePage -> skipUserProfileSetup()
         }
+    }
+
+    private fun skipUserProfileSetup() {
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                dbRepository.skipUserProfileSetup()
+            }
+        }catch (e: Exception){
+            getUserDetails()
+        }
+
+
     }
 
     private fun compareUserPreference(product: Product?) {
@@ -257,6 +270,7 @@ class HomePageViewModel(
             if (profileDetails is Resource.Success){
                 withContext(Dispatchers.Main){
                     profileDetails.data?.let {details ->
+                        logger(profileDetails.data.userDetails.userName)
                         _uiState.update {
                             it.copy(
                                 user = details.userDetails,
@@ -268,12 +282,11 @@ class HomePageViewModel(
                             )
                         }
                     }
-
                 }
             }
 
+            logger((profileDetails.data?.userDetails ?: "null").toString())
             withContext(Dispatchers.Main){
-
                 _uiState.update {
                     it.copy(userDetailsFetchState = UserDetailsFetchState.NOT_STARTED)
                 }

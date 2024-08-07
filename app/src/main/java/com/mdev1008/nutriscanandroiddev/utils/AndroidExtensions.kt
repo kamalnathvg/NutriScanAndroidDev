@@ -1,10 +1,12 @@
 package com.mdev1008.nutriscanandroiddev.utils
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
+import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
@@ -77,4 +79,13 @@ fun ImageView.loadFromUrlOrGone(imageUrl: String?, errorImage: Drawable? = null)
         .load(imageUrl)
         .error(errorImage)
         .into(this)
+}
+
+fun Activity.showProgressBar(){
+    this.findViewById<View>(R.id.blurBg).show()
+    this.findViewById<ProgressBar>(R.id.progress_bar).show()
+}
+fun Activity.hideProgressBar(){
+    this.findViewById<View>(R.id.blurBg).hide()
+    this.findViewById<ProgressBar>(R.id.progress_bar).hide()
 }

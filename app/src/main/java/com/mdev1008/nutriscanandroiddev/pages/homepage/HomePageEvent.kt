@@ -11,4 +11,5 @@ sealed class HomePageEvent {
     data class FetchProductDetails(val productId: String): HomePageEvent()
     data class UpdateUserDetails(val userDetails: UserProfileDetails): HomePageEvent()
     data object GetUserDetails: HomePageEvent()
+    data object SkipProfilePage: HomePageEvent()
 }

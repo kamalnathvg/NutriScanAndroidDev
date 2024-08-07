@@ -1,8 +1,12 @@
 package com.mdev1008.nutriscanandroiddev.pages.profilepage
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -10,8 +14,10 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.ToggleButton
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -32,6 +38,7 @@ import com.mdev1008.nutriscanandroiddev.models.remote.UserDietaryRestriction
 import com.mdev1008.nutriscanandroiddev.models.remote.UserProfileDetails
 import com.mdev1008.nutriscanandroiddev.models.remote.containsAllergen
 import com.mdev1008.nutriscanandroiddev.models.remote.containsRestriction
+import com.mdev1008.nutriscanandroiddev.models.remote.dietaryRestrictionForProfilePage
 import com.mdev1008.nutriscanandroiddev.models.remote.getPreference
 import com.mdev1008.nutriscanandroiddev.models.remote.removeAllergen
 import com.mdev1008.nutriscanandroiddev.models.remote.removeRestriction
@@ -82,10 +89,37 @@ class ProfilePage : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         prefillTextField()
+        setUpToolbar()
         buildDietaryPreferenceView()
         buildDietaryRestrictionView()
         buildAllergenView()
         setupSaveButton()
+    }
+
+    private fun setUpToolbar() {
+        val appCompatActivity = activity as AppCompatActivity
+        mainViewBinding.mtbProfilePage.let { materialToolbar ->
+            appCompatActivity.setSupportActionBar(materialToolbar)
+            materialToolbar.title = getString(R.string.profile_page)
+            materialToolbar.setTitleTextColor(Color.WHITE)
+        }
+        if (viewModel.uiState.value.user?.isProfileCompleted == false){
+            appCompatActivity.addMenuProvider(object: MenuProvider{
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.profile_page_menu,menu)
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when(menuItem.itemId){
+                     R.id.mi_skip_profile_page -> {
+                         viewModel.emit(HomePageEvent.SkipProfilePage)
+                         findNavController().popBackStack()
+                         true
+                     }
+                        else -> false
+                    }
+                } },viewLifecycleOwner)
+        }
     }
 
     private fun prefillTextField() {
@@ -178,7 +212,7 @@ class ProfilePage : Fragment() {
                 toggleLayout(clCollapsableDietaryRestriction, ivDietaryRestrictionExpandCollapse)
             }
         }
-        DietaryRestriction.entries.forEach { restriction ->
+        dietaryRestrictionForProfilePage().forEach { restriction ->
             val button = ToggleButton(requireContext())
             button.apply {
                 background = ContextCompat.getDrawable(requireContext(), R.drawable.dietary_restriction_selector)

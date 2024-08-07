@@ -9,6 +9,14 @@
     tools:context=".pages.profilepage.ProfilePage">
 
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/mtb_profile_page"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme" />
+
     <ScrollView
         android:id="@+id/sv_profile_details"
         android:layout_width="match_parent"

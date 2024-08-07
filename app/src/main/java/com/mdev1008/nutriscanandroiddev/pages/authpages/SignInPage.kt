@@ -15,6 +15,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.mdev1008.nutriscanandroiddev.NutriScanApplication
 import com.mdev1008.nutriscanandroiddev.R
 import com.mdev1008.nutriscanandroiddev.databinding.FragmentSignInPageBinding
+import com.mdev1008.nutriscanandroiddev.utils.hideKeyboard
 import com.mdev1008.nutriscanandroiddev.utils.isValidPassword
 import com.mdev1008.nutriscanandroiddev.utils.isValidUserName
 import com.mdev1008.nutriscanandroiddev.utils.logger
@@ -49,6 +50,7 @@ class SignInPage : Fragment() {
             findNavController().navigate(R.id.action_sign_in_page_to_register_page)
         }
         viewBinding.btnSignIn.setOnClickListener {
+            view.hideKeyboard()
             viewBinding.apply {
                 tilUsername.error = null
                 tilPassword.error = null
@@ -67,7 +69,8 @@ class SignInPage : Fragment() {
                     SignInState.SUCCESS -> {
                         logger(state.signInState.name)
                         view.showSnackBar(state.message, Snackbar.LENGTH_LONG)
-                        findNavController().navigate(R.id.action_sign_in_page_to_home_page)
+//                        findNavController().navigate(R.id.action_sign_in_page_to_home_page)
+                        findNavController().popBackStack()
                     }
                     SignInState.FAILURE -> {
                         logger(state.signInState.name)

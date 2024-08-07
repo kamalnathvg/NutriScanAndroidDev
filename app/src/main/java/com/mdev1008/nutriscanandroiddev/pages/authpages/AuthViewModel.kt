@@ -52,7 +52,7 @@ class AuthViewModel(private val dbRepository: DbRepository) : ViewModel() {
                     withContext(Dispatchers.Main){
                     when(result){
                         is Resource.Success -> {
-                                changeRegisterState(RegisterState.SUCCESS)
+                                changeRegisterState(RegisterState.SUCCESS,result.message)
                             }
                         is Resource.Failure -> {
                                 changeRegisterState(RegisterState.FAILURE,result.message)
@@ -73,7 +73,7 @@ class AuthViewModel(private val dbRepository: DbRepository) : ViewModel() {
                     withContext(Dispatchers.Main){
                         when(result){
                             is Resource.Success -> {
-                                changeSignInState(SignInState.SUCCESS)
+                                changeSignInState(SignInState.SUCCESS,result.message)
                             }
                             is Resource.Failure -> {
                                 changeSignInState(SignInState.FAILURE,result.message)

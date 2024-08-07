@@ -9,18 +9,19 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.mdev1008.nutriscanandroiddev.R
 import com.mdev1008.nutriscanandroiddev.models.data.HealthCategory
 import com.mdev1008.nutriscanandroiddev.models.data.SearchHistoryItem
-import com.mdev1008.nutriscanandroiddev.utils.TimeCalculator
 import com.mdev1008.nutriscanandroiddev.utils.getDurationTillNow
 import com.mdev1008.nutriscanandroiddev.utils.loadFromUrlOrGone
 import com.mdev1008.nutriscanandroiddev.utils.toReadableString
-import java.time.LocalDateTime
-import java.time.ZoneId
 
-class SearchHistoryAdapter(private val viewModel: HomePageViewModel ,private var searchHistoryItems : List<SearchHistoryItem>) : RecyclerView.Adapter<SearchHistoryAdapter.SearchHistoryViewHolder>() {
+class SearchHistoryAdapter(
+    private val viewModel: HomePageViewModel,
+    private var searchHistoryItems: List<SearchHistoryItem>,
+    private val onShowProgress: Unit?,
+    private val onHideProgress: Unit?
+) : RecyclerView.Adapter<SearchHistoryAdapter.SearchHistoryViewHolder>() {
     inner class SearchHistoryViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
         val ivSearchHistoryImage : ImageView = itemView.findViewById(R.id.iv_search_history_image)
         val tvSearchHistoryName : TextView = itemView.findViewById(R.id.tv_search_history_name)
@@ -49,6 +50,8 @@ class SearchHistoryAdapter(private val viewModel: HomePageViewModel ,private var
         holder.ivSearchHistoryImage.loadFromUrlOrGone(item.imageUrl)
         holder.ivSearchHistoryHealthCategory.setImageResource(healthCategoryIcon)
         holder.cvListItem.setOnClickListener{
+            it.isClickable = false
+            onShowProgress
             viewModel.emit(HomePageEvent.FetchProductDetails(item.productId ?: ""))
         }
     }

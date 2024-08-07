@@ -8,7 +8,6 @@ import com.mdev1008.nutriscanandroiddev.models.remote.generateUserDietaryPrefere
 import com.mdev1008.nutriscanandroiddev.utils.Resource
 import com.mdev1008.nutriscanandroiddev.utils.encrypt
 import com.mdev1008.nutriscanandroiddev.utils.logger
-import kotlin.math.log
 
 
 class DbRepository(private val db: AppDatabase) {
@@ -17,12 +16,18 @@ class DbRepository(private val db: AppDatabase) {
 
     fun getCurrentUser() = currentUser
 
+    private fun updateCurrentUser(){
+        currentUser?.let {
+            currentUser = getUser(it.userName)
+        }
+    }
+
     fun signInWithUserNamePassword(userName: String, password: String): Resource<User>{
         val user = getUser(userName) ?: return Resource.Failure("Not user exists with the given userName")
 
         if (user.password == password.encrypt()){
             this.currentUser = user
-            return Resource.Success(user)
+            return Resource.Success(user,"Signing in...")
 
         }
         return Resource.Failure("Invalid Password")
@@ -45,7 +50,7 @@ class DbRepository(private val db: AppDatabase) {
                 db.userDietaryPreferenceDao().addPreferences(generateUserDietaryPreferences(it))
                 logger(generateUserDietaryPreferences(it).toString())
             }
-            return Resource.Success(user)
+            return Resource.Success(data = user, message = "Successfully registered with username $userName" )
         }catch (e: Exception){
             logger(e.message.toString())
             return Resource.Failure(e.message)
@@ -61,7 +66,6 @@ class DbRepository(private val db: AppDatabase) {
      * returns true if a user exists with the given userName
      */
     private fun userAlreadyExists(userName: String): Boolean{
-
         val users =  db.userDao().getUser(userName)
         return users.isNotEmpty()
     }
@@ -127,6 +131,7 @@ class DbRepository(private val db: AppDatabase) {
                 db.userRestrictionDao().addUserRestriction(userProfileDetails.userRestrictions)
                 db.userAllergenDao().addUserAllergens(userProfileDetails.userAllergen)
                 logger("Successfully updated")
+                updateCurrentUser()
                 return Resource.Success("Profile Updated Successfully")
             }
             return Resource.Failure("User not Signed In")
@@ -135,4 +140,13 @@ class DbRepository(private val db: AppDatabase) {
             return Resource.Failure(e.message)
         }
    }
+
+    fun skipUserProfileSetup() {
+        currentUser?.let {user ->
+            db.userDao().updateUser(
+                user.copy(isProfileCompleted = true)
+            )
+        }
+        updateCurrentUser()
+    }
 }

@@ -18,3 +18,12 @@ fun String.toDietaryRestriction(): DietaryRestriction?{
         it.response == this
     }
 }
+
+fun dietaryRestrictionForProfilePage(): List<DietaryRestriction>{
+    return mutableListOf<DietaryRestriction>(
+        DietaryRestriction.VEGAN,
+        DietaryRestriction.VEGETARIAN,
+        DietaryRestriction.PALM_OIL_FREE
+    )
+}
+

@@ -11,4 +11,6 @@
     <string name="serving_per_100gm">Serving per 100gm</string>
     <string name="product_details">Product Details</string>
     <string name="homepage_title">Home Page</string>
+    <string name="no_nutrient_details_available_for_the_product">No Nutrient Details Available for the Product :(</string>
+    <string name="profile_page">Profile Page</string>
 </resources>
