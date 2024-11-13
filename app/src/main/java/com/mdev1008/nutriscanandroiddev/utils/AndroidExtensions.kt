@@ -11,8 +11,8 @@ import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.mdev1008.nutriscanandroiddev.R
-import com.mdev1008.nutriscanandroiddev.models.data.HealthCategory
-import com.mdev1008.nutriscanandroiddev.models.data.NutrientType
+import com.mdev1008.nutriscanandroiddev.data.model.HealthCategory
+import com.mdev1008.nutriscanandroiddev.data.model.NutrientType
 
 fun View.show() {
     this.visibility = View.VISIBLE

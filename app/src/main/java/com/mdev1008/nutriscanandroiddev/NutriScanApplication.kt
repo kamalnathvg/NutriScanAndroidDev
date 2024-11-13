@@ -1,9 +1,9 @@
 package com.mdev1008.nutriscanandroiddev
 
 import android.app.Application
-import com.mdev1008.nutriscanandroiddev.models.remote.AppDatabase
-import com.mdev1008.nutriscanandroiddev.repositories.ApiRepository
-import com.mdev1008.nutriscanandroiddev.repositories.DbRepository
+import com.mdev1008.nutriscanandroiddev.data.AppDatabase
+import com.mdev1008.nutriscanandroiddev.data.repository.ApiRepository
+import com.mdev1008.nutriscanandroiddev.data.repository.DbRepository
 
 class NutriScanApplication: Application() {
     private lateinit var database: AppDatabase

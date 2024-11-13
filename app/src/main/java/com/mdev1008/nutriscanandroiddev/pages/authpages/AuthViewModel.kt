@@ -3,8 +3,8 @@ package com.mdev1008.nutriscanandroiddev.pages.authpages
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.mdev1008.nutriscanandroiddev.models.remote.User
-import com.mdev1008.nutriscanandroiddev.repositories.DbRepository
+import com.mdev1008.nutriscanandroiddev.data.model.User
+import com.mdev1008.nutriscanandroiddev.data.repository.DbRepository
 import com.mdev1008.nutriscanandroiddev.utils.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

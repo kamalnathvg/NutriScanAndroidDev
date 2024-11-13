@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/md_theme_background"
     android:backgroundTint="@color/md_theme_background"
-    tools:context=".pages.homepage.HomePage">
+    tools:context=".presentation.home_page.HomePage">
 
 
     <com.google.android.material.appbar.MaterialToolbar
