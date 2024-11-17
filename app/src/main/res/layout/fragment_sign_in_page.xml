@@ -5,7 +5,7 @@
     android:id="@+id/sign_in_page"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.login_page.SignInPage">
+    tools:context=".presentation.login_page.LoginPage">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/mtb_sign_in_page"

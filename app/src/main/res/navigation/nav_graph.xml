@@ -13,7 +13,7 @@
     </fragment>
     <fragment
         android:id="@+id/sign_in_page"
-        android:name="com.mdev1008.nutriscanandroiddev.presentation.login_page.SignInPage"
+        android:name="com.mdev1008.nutriscanandroiddev.presentation.login_page.LoginPage"
         android:label="SignInPage"
         tools:layout="@layout/fragment_sign_in_page" >
         <action

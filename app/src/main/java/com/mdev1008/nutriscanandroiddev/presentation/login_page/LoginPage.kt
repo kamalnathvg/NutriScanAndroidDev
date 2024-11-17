@@ -24,10 +24,11 @@ import com.mdev1008.nutriscanandroiddev.utils.hideKeyboard
 import com.mdev1008.nutriscanandroiddev.utils.isValidPassword
 import com.mdev1008.nutriscanandroiddev.utils.isValidUserName
 import com.mdev1008.nutriscanandroiddev.utils.debugLogger
+import com.mdev1008.nutriscanandroiddev.utils.errorLogger
 import com.mdev1008.nutriscanandroiddev.utils.showSnackBar
 import kotlinx.coroutines.launch
 
-class SignInPage : Fragment() {
+class LoginPage : Fragment() {
 
 
     private val viewModel: AuthViewModel by activityViewModels<AuthViewModel> {
@@ -86,7 +87,7 @@ class SignInPage : Fragment() {
                         findNavController().popBackStack()
                     }
                     SignInState.FAILURE -> {
-                        logger(state.signInState.name)
+                        errorLogger(state.signInState.name)
                         view.showSnackBar(state.message, Snackbar.LENGTH_LONG)
                     }
                     SignInState.NOT_STARTED -> {}
