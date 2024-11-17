@@ -45,7 +45,7 @@ import com.mdev1008.nutriscanandroiddev.presentation.home_page.HomePageViewModel
 import com.mdev1008.nutriscanandroiddev.presentation.home_page.HomePageViewModelFactory
 import com.mdev1008.nutriscanandroiddev.utils.hide
 import com.mdev1008.nutriscanandroiddev.utils.isValidUserName
-import com.mdev1008.nutriscanandroiddev.utils.logger
+import com.mdev1008.nutriscanandroiddev.utils.debugLogger
 import com.mdev1008.nutriscanandroiddev.utils.show
 import com.mdev1008.nutriscanandroiddev.utils.showSnackBar
 import kotlinx.coroutines.delay
@@ -128,7 +128,7 @@ class ProfilePage : Fragment() {
 
     private fun setupSaveButton() {
         mainViewBinding.btnSaveUserDetails.setOnClickListener {
-            logger("dietary Preference: $dietaryPreference")
+            debugLogger("dietary Preference: $dietaryPreference")
             val userName = mainViewBinding.tiUsernameEditText.text.toString()
             val uid = viewModel.uiState.value.user?.id
             if (userName.isValidUserName().first && uid != null){
@@ -157,7 +157,7 @@ class ProfilePage : Fragment() {
     private fun buildAllergenView() {
         mainViewBinding.apply {
             llAllergenHeaderLayout.setOnClickListener {
-                logger("clicked allergen header")
+                debugLogger("clicked allergen header")
                 toggleLayout(clAllergenCollapsable, ivAllergenExpandCollapse)
             }
         }

@@ -62,7 +62,3 @@ data class NutriScoreData(
     @SerializedName("sugars_value")
     val sugarsValue: Double? = null
 )
-
-
-
-

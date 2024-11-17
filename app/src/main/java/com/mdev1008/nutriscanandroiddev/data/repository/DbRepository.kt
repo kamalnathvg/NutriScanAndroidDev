@@ -7,7 +7,7 @@ import com.mdev1008.nutriscanandroiddev.data.model.UserProfileDetails
 import com.mdev1008.nutriscanandroiddev.data.model.generateUserDietaryPreferences
 import com.mdev1008.nutriscanandroiddev.utils.Resource
 import com.mdev1008.nutriscanandroiddev.utils.encrypt
-import com.mdev1008.nutriscanandroiddev.utils.logger
+import com.mdev1008.nutriscanandroiddev.utils.debugLogger
 
 
 class DbRepository(private val db: AppDatabase) {
@@ -48,11 +48,11 @@ class DbRepository(private val db: AppDatabase) {
             val userId = db.userDao().getUser(userName).getOrNull(0)?.id
             userId?.let {
                 db.userDietaryPreferenceDao().addPreferences(generateUserDietaryPreferences(it))
-                logger(generateUserDietaryPreferences(it).toString())
+                debugLogger(generateUserDietaryPreferences(it).toString())
             }
             return Resource.Success(data = user, message = "Successfully registered with username $userName" )
         }catch (e: Exception){
-            logger(e.message.toString())
+            debugLogger(e.message.toString())
             return Resource.Failure(e.message)
         }
     }
@@ -118,9 +118,9 @@ class DbRepository(private val db: AppDatabase) {
         }
     }
 
-    fun upsertUserProfileDetails(userProfileDetails: UserProfileDetails): Resource<String>{
+    fun upsertUserProfileDetails(userProfileDetails: UserProfileDetails): Resource<Unit>{
         try {
-            logger("Trying to update user details")
+            debugLogger("Trying to update user details")
             currentUser?.id?.let {
 //                db.userDietaryPreferenceDao().deletePreferences(it)
                 db.userRestrictionDao().deleteUserRestrictions(it)
@@ -130,9 +130,9 @@ class DbRepository(private val db: AppDatabase) {
                 db.userDietaryPreferenceDao().addPreferences(userProfileDetails.userPreferences)
                 db.userRestrictionDao().addUserRestriction(userProfileDetails.userRestrictions)
                 db.userAllergenDao().addUserAllergens(userProfileDetails.userAllergen)
-                logger("Successfully updated")
+                debugLogger("Successfully updated")
                 updateCurrentUser()
-                return Resource.Success("Profile Updated Successfully")
+                return Resource.Success(Unit)
             }
             return Resource.Failure("User not Signed In")
 

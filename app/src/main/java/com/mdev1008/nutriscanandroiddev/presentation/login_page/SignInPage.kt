@@ -23,7 +23,7 @@ import com.mdev1008.nutriscanandroiddev.presentation.home_page.HomePageViewModel
 import com.mdev1008.nutriscanandroiddev.utils.hideKeyboard
 import com.mdev1008.nutriscanandroiddev.utils.isValidPassword
 import com.mdev1008.nutriscanandroiddev.utils.isValidUserName
-import com.mdev1008.nutriscanandroiddev.utils.logger
+import com.mdev1008.nutriscanandroiddev.utils.debugLogger
 import com.mdev1008.nutriscanandroiddev.utils.showSnackBar
 import kotlinx.coroutines.launch
 
@@ -76,10 +76,10 @@ class SignInPage : Fragment() {
             viewModel.uiState.collect{state ->
                 when(state.signInState){
                     SignInState.LOADING -> {
-                        logger(state.signInState.name)
+                        debugLogger(state.signInState.name)
                     }
                     SignInState.SUCCESS -> {
-                        logger(state.signInState.name)
+                        debugLogger(state.signInState.name)
                         view.showSnackBar(state.message, Snackbar.LENGTH_LONG)
 //                        findNavController().navigate(R.id.action_sign_in_page_to_home_page)
                         homepageViewModel.emit(HomePageEvent.GetUserDetails)

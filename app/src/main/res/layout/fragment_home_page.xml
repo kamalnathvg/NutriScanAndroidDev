@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/homePage"
@@ -7,57 +7,123 @@
     android:layout_height="match_parent"
     android:background="@color/md_theme_background"
     android:backgroundTint="@color/md_theme_background"
+    android:orientation="vertical"
     tools:context=".presentation.home_page.HomePage">
 
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/mtb_home_page"
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_margin="12dp"
+        app:cardBackgroundColor="@color/md_theme_tertiaryContainer"
+        app:cardCornerRadius="12dp"
+        >
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            >
+
+            <TextView
+                android:id="@+id/tv_hp_user_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/iv_hp_user_palm_oil"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="Hello, Kamal"
+                android:fontFamily="@font/inter_semi_bold"
+                android:textStyle="italic"
+
+                />
+
+            <ImageView
+                android:id="@+id/iv_hp_user_palm_oil"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/tv_hp_user_name"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginTop="32dp"
+                app:layout_constraintEnd_toStartOf="@+id/iv_hp_user_vegan"
+                tools:srcCompat="@drawable/circle_good" />
+
+            <ImageView
+                android:id="@+id/iv_hp_user_vegan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                app:layout_constraintStart_toEndOf="@id/iv_hp_user_palm_oil"
+                app:layout_constraintTop_toBottomOf="@id/tv_hp_user_name"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/iv_hp_user_vegetarian"
+                tools:srcCompat="@drawable/circle_moderate" />
+            <ImageView
+                android:id="@+id/iv_hp_user_vegetarian"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_hp_user_name"
+                app:layout_constraintStart_toEndOf="@id/iv_hp_user_vegan"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:srcCompat="@drawable/circle_unknown"
+                />
+            <ImageView
+                android:id="@+id/iv_profile_details"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_hp_user_name"
+                app:layout_constraintStart_toEndOf="@id/iv_hp_user_vegetarian"
+                app:layout_constraintHorizontal_bias="100"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:srcCompat="@drawable/baseline_keyboard_arrow_right_24"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:fontFamily="@font/inter_bold"
+        android:textSize="20sp"
+        tools:text="Recents"
+        />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_search_history"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mtb_home_page" />
+        android:id="@+id/rv_hp_search_history"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:orientation="horizontal"
+        tools:itemCount="4"
+        tools:listitem="@layout/component_hp_history_item"
+        tools:visibility="visible" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_scan_product"
+    <TextView
+        android:id="@+id/tv_recommended_products_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
-        android:clickable="true"
-        android:src="@mipmap/barcode"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        android:layout_marginStart="12dp"
+        android:fontFamily="@font/inter_bold"
+        android:textSize="20sp"
+        tools:text="Recommended"
+        />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_get_demo_item"
-        android:layout_width="wrap_content"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_recommended_product"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
-        android:clickable="true"
-        android:src="@mipmap/calories"
-        app:layout_constraintBottom_toTopOf="@+id/fab_scan_product"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        tools:spanCount="2"
+        android:orientation="vertical"
+        tools:itemCount="4"
+        tools:listitem="@layout/component_hp_recommended_item"
+        tools:visibility="visible" />
+
+</LinearLayout>

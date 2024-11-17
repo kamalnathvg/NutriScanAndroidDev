@@ -3,6 +3,10 @@ package com.mdev1008.nutriscanandroiddev.data.repository
 import com.mdev1008.nutriscanandroiddev.data.model.Product
 import com.google.gson.GsonBuilder
 import com.mdev1008.nutriscanandroiddev.data.ApiRequests
+import com.mdev1008.nutriscanandroiddev.data.model.Allergen
+import com.mdev1008.nutriscanandroiddev.data.model.DietaryRestriction
+import com.mdev1008.nutriscanandroiddev.data.model.RecommendedProductsResponseDto
+import com.mdev1008.nutriscanandroiddev.data.model.UserDietaryPreference
 import com.mdev1008.nutriscanandroiddev.utils.AppResources
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -14,7 +18,8 @@ import com.mdev1008.nutriscanandroiddev.utils.AppResources.Companion.UNKNOWN_HOS
 import com.mdev1008.nutriscanandroiddev.utils.AppResources.Companion.UNKNOWN_ERROR_MESSAGE
 import com.mdev1008.nutriscanandroiddev.utils.AppResources.Companion.PRODUCT_NOT_FOUND_MESSAGE
 import com.mdev1008.nutriscanandroiddev.utils.AppResources.Companion.CONNECTION_TIMEOUT_MESSAGE
-import com.mdev1008.nutriscanandroiddev.utils.logger
+import com.mdev1008.nutriscanandroiddev.utils.debugLogger
+import com.mdev1008.nutriscanandroiddev.utils.errorLogger
 import okhttp3.OkHttpClient
 import java.lang.IndexOutOfBoundsException
 import java.net.SocketTimeoutException
@@ -39,20 +44,20 @@ class ApiRepository {
     private val apiRequests = retrofit.create<ApiRequests>()
 
     fun getProductDetails(productId: String): Resource<Product>{
-        logger("fetching details for product $productId")
+        debugLogger("fetching details for product $productId")
         try {
             val response = apiRequests.getProductDetailsById(productId, getProductDetailsFields()).execute()
-            logger(response.body().toString())
+            debugLogger(response.body().toString())
             if (response.isSuccessful){
                 val productDetails = response.body()?.products?.get(0)
-                logger("response success in app repository")
+                debugLogger("response success in app repository")
                 return Resource.Success(data = productDetails)
             }else{
-                logger("response failure in app repository")
+                errorLogger("response failure in app repository")
                 return Resource.Failure(message = response.message().toString())
             }
         }catch (e: Exception){
-            logger(e.toString())
+            errorLogger(e.toString())
             return when(e){
                 is UnknownHostException -> Resource.Failure(message = UNKNOWN_HOST_EXCEPTION_MESSAGE)
                 is IndexOutOfBoundsException -> Resource.Failure(message = PRODUCT_NOT_FOUND_MESSAGE)
@@ -62,11 +67,20 @@ class ApiRepository {
         }
     }
 
-    fun registerWithUserNamePassword(userName: String, password: String){
-
-    }
-
-    fun signInWithUserNamePassword(userName: String, password: String){
+    fun getRecommendedProducts(
+        category: List<String>,
+        dietaryRestrictions: List<DietaryRestriction>,
+        allergens: List<Allergen>
+    ): RecommendedProductsResponseDto?{
+        val categories = category[0]
+        val response = apiRequests.getRecommendedProducts(
+            fields = AppResources.getRecommendedProductFields(),
+            categories = categories,
+            sortBy = "",
+            allergenTags = allergens.joinToString(",-") { it.allergenStrings.joinToString(",-") },
+            ingredientAnalysisTags = dietaryRestrictions.joinToString(",") { it.response }
+        ).execute()
+        return response.body()
 
     }
 }

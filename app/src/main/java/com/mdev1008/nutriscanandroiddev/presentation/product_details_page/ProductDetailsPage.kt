@@ -20,20 +20,19 @@ import com.mdev1008.nutriscanandroiddev.databinding.FragmentProductDetailsPageBi
 import com.mdev1008.nutriscanandroiddev.domain.model.MainDetailsForView
 import com.mdev1008.nutriscanandroiddev.data.model.NutrientCategory
 import com.mdev1008.nutriscanandroiddev.domain.model.NutrientForView
-import com.mdev1008.nutriscanandroiddev.presentation.home_page.HomePageViewModel
 import com.mdev1008.nutriscanandroiddev.presentation.home_page.HomePageViewModelFactory
 import com.mdev1008.nutriscanandroiddev.utils.getIcon
 import com.mdev1008.nutriscanandroiddev.utils.getIconAndBg
 import com.mdev1008.nutriscanandroiddev.utils.loadFromUrlOrGone
-import com.mdev1008.nutriscanandroiddev.data.model.getMainDetailsForView
-import com.mdev1008.nutriscanandroiddev.utils.logger
-import com.mdev1008.nutriscanandroiddev.data.model.getNutrientsForView
+import com.mdev1008.nutriscanandroiddev.domain.model.ProductDetailsForView
+import com.mdev1008.nutriscanandroiddev.utils.Status
+import com.mdev1008.nutriscanandroiddev.utils.infoLogger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ProductDetailsPage : Fragment() {
 
-    private val viewModel by activityViewModels<HomePageViewModel> {
+    private val viewModel by activityViewModels<ProductDetailsViewModel> {
         val nutriScanApplication = requireActivity().application as NutriScanApplication
         HomePageViewModelFactory(
             apiRepository = nutriScanApplication.apiRepository,
@@ -52,23 +51,35 @@ class ProductDetailsPage : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val productId = arguments?.getString("productId")
+        if (productId != null){
+            viewModel.onEvent(ProductDetailsPageEvent.GetProductDetailsById(productId))
+        }
         NavigationUI.setupWithNavController(viewBindingLayout.mtbProductDetailsPage,findNavController())
         viewBindingLayout.mtbProductDetailsPage.title = getString(R.string.product_details)
         viewBindingLayout.mtbProductDetailsPage.setTitleTextColor(Color.WHITE)
 
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-            viewModel.uiState.collect{state ->
-                state.product?.let { product ->
-                    logger(product.productName)
-                    buildProductDetailsUi(product)
+            viewModel.uiState.collect{ state ->
+                when(state.productDetailsFetchState){
+                    Status.LOADING -> {
+                        infoLogger("Loading product details")
+                    }
+                    Status.SUCCESS -> {
+                        state.productDetailsForView?.let { productDetailsForView ->
+                            buildProductDetailsUi(state.productDetailsForView)
+                        }
+                    }
+                    Status.FAILURE -> TODO()
+                    Status.IDLE -> TODO()
                 }
             }
         }
     }
 
-    private fun buildProductDetailsUi(product: Product) {
-        buildMainHeaderView(product.getMainDetailsForView())
-        product.getNutrientsForView()?.let { nutrientsForView ->
+    private fun buildProductDetailsUi(product: ProductDetailsForView) {
+        buildMainHeaderView(product.mainDetailsForView)
+        product.nutrients.let { nutrientsForView ->
             val negativeNutrients =  nutrientsForView.filter {
                 it.nutrientCategory == NutrientCategory.NEGATIVE
             }
@@ -116,7 +127,7 @@ class ProductDetailsPage : Fragment() {
     }
 
     private fun buildMainHeaderView(mainDetailsForView: MainDetailsForView) {
-        val conclusions = viewModel.uiState.value.userPreferencesConclusion
+//        val conclusions = viewModel.uiState.value.userPreferencesConclusion
         val mainHeaderView = LayoutInflater.from(requireContext())
 
             .inflate(R.layout.component_pdp_main_details_view, viewBindingLayout.llProductDetailsLayout, false)
@@ -124,9 +135,9 @@ class ProductDetailsPage : Fragment() {
         mainHeaderView.findViewById<TextView>(R.id.tv_product_name).text = mainDetailsForView.productName
         mainHeaderView.findViewById<TextView>(R.id.tv_product_brand).text = mainDetailsForView.productBrand
         mainHeaderView.findViewById<TextView>(R.id.tv_product_health_grade).text = mainDetailsForView.healthCategory?.description
-        mainHeaderView.findViewById<TextView>(R.id.tv_dietary_preference_conclusion).text = conclusions.userDietaryPreferenceConclusion
-        mainHeaderView.findViewById<TextView>(R.id.tv_dietary_restriction_conclusion).text = conclusions.userDietaryRestrictionConclusion
-        mainHeaderView.findViewById<TextView>(R.id.tv_allergen_conclusion).text = conclusions.userAllergenConclusion
+//        mainHeaderView.findViewById<TextView>(R.id.tv_dietary_preference_conclusion).text = conclusions.userDietaryPreferenceConclusion
+//        mainHeaderView.findViewById<TextView>(R.id.tv_dietary_restriction_conclusion).text = conclusions.userDietaryRestrictionConclusion
+//        mainHeaderView.findViewById<TextView>(R.id.tv_allergen_conclusion).text = conclusions.userAllergenConclusion
         val (healthCategoryIcon, cardBgColor) = mainDetailsForView.healthCategory.getIconAndBg(requireContext())
         mainHeaderView.findViewById<CardView>(R.id.cv_product_health).setCardBackgroundColor(cardBgColor)
         mainHeaderView.findViewById<ImageView>(R.id.iv_product_health_icon).setImageResource(healthCategoryIcon)

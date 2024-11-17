@@ -1,12 +1,10 @@
 package com.mdev1008.nutriscanandroiddev.utils
 
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.util.Log
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
-import kotlin.concurrent.timerTask
 
 object BarcodeScanner{
 
@@ -35,6 +33,14 @@ object BarcodeScanner{
     }
 }
 
-fun logger(message: String){
+fun debugLogger(message: String){
     Log.d(AppResources.LOGGER_TAG, message)
+}
+
+fun infoLogger(message: String){
+    Log.i(AppResources.LOGGER_TAG,message)
+}
+
+fun errorLogger(message: String){
+    Log.e(AppResources.LOGGER_TAG, message)
 }

@@ -10,12 +10,12 @@ import com.mdev1008.nutriscanandroiddev.data.model.User
 import com.mdev1008.nutriscanandroiddev.data.model.UserAllergen
 import com.mdev1008.nutriscanandroiddev.data.model.UserDietaryPreference
 import com.mdev1008.nutriscanandroiddev.data.model.UserDietaryRestriction
+import com.mdev1008.nutriscanandroiddev.data.model.UserProfileDetails
 import com.mdev1008.nutriscanandroiddev.data.model.getConclusion
 import com.mdev1008.nutriscanandroiddev.data.model.toAllergens
 import com.mdev1008.nutriscanandroiddev.data.repository.ApiRepository
 import com.mdev1008.nutriscanandroiddev.data.repository.DbRepository
 import com.mdev1008.nutriscanandroiddev.utils.Resource
-import com.mdev1008.nutriscanandroiddev.utils.logger
 import com.mdev1008.nutriscanandroiddev.data.model.getNutrientsForView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -26,279 +26,164 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.mdev1008.nutriscanandroiddev.data.model.toDietaryRestrictions
 import com.mdev1008.nutriscanandroiddev.data.model.toSearchHistoryItem
+import com.mdev1008.nutriscanandroiddev.domain.model.RecommendedProductForView
+import com.mdev1008.nutriscanandroiddev.domain.model.SearchHistoryItemForView
+import com.mdev1008.nutriscanandroiddev.domain.usecase.GetRecommendedProductsUseCase
+import com.mdev1008.nutriscanandroiddev.domain.usecase.GetSearchHistoryUseCase
+import com.mdev1008.nutriscanandroiddev.domain.usecase.GetUserDetailsUseCase
+import com.mdev1008.nutriscanandroiddev.utils.Status
+import com.mdev1008.nutriscanandroiddev.utils.infoLogger
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import java.time.LocalDateTime
 
 data class HomePageState(
-    val message: String? = null,
-    val searchHistory: List<SearchHistoryItem> = mutableListOf(),
-    val productDetailsFetchState: ProductDetailsFetchState = ProductDetailsFetchState.NOT_STARTED,
-    val product: Product? = null,
-    val user: User? = null,
-    val dietaryPreferences: List<UserDietaryPreference> = mutableListOf(),
-    val dietaryRestriction: List<UserDietaryRestriction> = mutableListOf(),
-    val allergens: List<UserAllergen> = mutableListOf(),
-    val userDetailsFetchState: UserDetailsFetchState = UserDetailsFetchState.NOT_STARTED,
-    val userPreferencesConclusion: UserPreferenceConclusion = UserPreferenceConclusion()
+    val userDetailsFetchState: Status = Status.IDLE,
+    val searchHistoryFetchState: Status = Status.IDLE,
+    val recommendedProductsFetchSate: Status = Status.IDLE,
+    val userProfileDetails: UserProfileDetails? = null,
+    val searchHistory: List<SearchHistoryItemForView> = emptyList(),
+    val recommendedProducts: List<RecommendedProductForView> = emptyList(),
+    val errorMessage: String? = null
 )
 
-/**
- * keeps track of the product details fetch state when scanning a product barcode
- */
-enum class ProductDetailsFetchState{
-    LOADING,
-    SUCCESS,
-    FAILURE,
-    NOT_STARTED
-}
-/**
- * keeps track of the init user details fetch state
- */
-enum class UserDetailsFetchState{
-    LOADING,
-    SUCCESS,
-    FAILURE,
-    NOT_STARTED
-}
-
 class HomePageViewModel(
-    private val apiRepository: ApiRepository,
-    private val dbRepository: DbRepository
+    private val getSearchHistoryUseCase: GetSearchHistoryUseCase,
+    private val getUserDetailsUseCase: GetUserDetailsUseCase,
+    private val getRecommendedProductsUseCase: GetRecommendedProductsUseCase
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(HomePageState())
     val uiState = _uiState.asStateFlow()
 
     init {
-     getUserDetails()
-
+        getUserDetails()
+        getRecommendedProducts() //TODO: set default product category
     }
-
 
     fun emit(event: HomePageEvent){
         when(event){
-            is HomePageEvent.FetchSearchHistory -> {
-                //TODO: fetch search history from database
-                val result: Resource<List<SearchHistoryItem>> = dbRepository.getSearchHistory()
-                when(result){
-                    is Resource.Failure -> {
-                        _uiState.update {
-                            it.copy(
-                                message = result.message
-                            )
-                        }
-                    }
-                    is Resource.Success -> {
-                        result.data?.let { searchHistoryItems ->
-                            _uiState.update { state ->
-                               state.copy(
-                                   searchHistory = searchHistoryItems
-                               )
-                            }
-                        }
-                    }
-                }
-            }
+            is HomePageEvent.GetSearchHistory -> getSearchHistory()
+            is HomePageEvent.GetUserDetails -> getUserDetails()
+        }
+    }
 
-            is HomePageEvent.FetchProductDetails -> {
-                _uiState.update {
-                    it.copy(
-                        productDetailsFetchState = ProductDetailsFetchState.LOADING
-                    )
-                }
-
-                viewModelScope.launch(Dispatchers.IO) {
-                    val result: Resource<Product> = apiRepository.getProductDetails(event.productId)
-                    when(result) {
-                        is Resource.Success -> {
-                            logger("product details fetch success in viewModel")
-                            upsertItemToSearchHistory(result.data)
-                            compareUserPreference(result.data)
-                            withContext(Dispatchers.Main){
-                                _uiState.update {
-                                    it.copy(
-                                        product = result.data,
-                                        productDetailsFetchState = ProductDetailsFetchState.SUCCESS
-                                    )
-                                }
-                                _uiState.update {
-                                    it.copy(
-                                        productDetailsFetchState = ProductDetailsFetchState.NOT_STARTED
-                                    )
-                                }
-                            }
-
-                        }
-
-                        is Resource.Failure -> {
-                            logger("product details fetch failure in viewModel")
-                            withContext(Dispatchers.Main){
-                                _uiState.update {
-                                    it.copy(
-                                        message = result.message,
-                                        productDetailsFetchState = ProductDetailsFetchState.FAILURE
-                                    )
-                                }
-                                _uiState.update {
-                                    it.copy(
-                                        productDetailsFetchState = ProductDetailsFetchState.NOT_STARTED
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            HomePageEvent.SignOut -> {
-                viewModelScope.launch {
-                    withContext(Dispatchers.IO){
-                        dbRepository.signOut()
-                    }
-                }
-                _uiState.update {
-                    HomePageState()
-                }
-
-            }
-
-            is HomePageEvent.UpdateUserDetails ->{
-                event.userDetails.apply {
+    private fun getSearchHistory() {
+        getSearchHistoryUseCase().onEach { result ->
+            when(result){
+                is Resource.Failure -> {
                     _uiState.update {
                         it.copy(
-                            user = this.userDetails,
-                            dietaryPreferences = this.userPreferences,
-                            dietaryRestriction = this.userRestrictions,
-                            allergens = this.userAllergen
+                            searchHistoryFetchState = Status.FAILURE,
+                            errorMessage = result.message
                         )
                     }
-                viewModelScope.launch(Dispatchers.IO) {
-                    dbRepository.upsertUserProfileDetails(event.userDetails)
-                    delay(500)
+                    _uiState.update {
+                        it.copy(
+                            searchHistoryFetchState = Status.IDLE
+                        )
                     }
                 }
-
-//                getUserDetails()
-
-            }
-            HomePageEvent.GetUserDetails -> getUserDetails()
-            HomePageEvent.SkipProfilePage -> skipUserProfileSetup()
-        }
-    }
-
-    private fun skipUserProfileSetup() {
-        try {
-            viewModelScope.launch(Dispatchers.IO) {
-                dbRepository.skipUserProfileSetup()
-            }
-        }catch (e: Exception){
-        }
-
-
-    }
-
-    private fun compareUserPreference(product: Product?) {
-        if (product == null) return
-        val state = uiState.value
-        val dietaryPreferenceConclusion = state.dietaryPreferences
-            .toMutableList()
-            .getConclusion(product.getNutrientsForView())
-        val dietaryRestrictionConclusion = state.dietaryRestriction
-            .toMutableList()
-            .getConclusion(product.dietaryRestrictions?.toDietaryRestrictions())
-        val allergenConclusion = state.allergens
-            .toMutableList()
-            .getConclusion(product.allergensHierarchy?.toAllergens())
-            val userPreferencesConclusion = UserPreferenceConclusion(
-                userDietaryPreferenceConclusion = dietaryPreferenceConclusion,
-                userDietaryRestrictionConclusion = dietaryRestrictionConclusion,
-                userAllergenConclusion = allergenConclusion
-            )
-        _uiState.update {
-            it.copy(
-                userPreferencesConclusion = userPreferencesConclusion
-            )
-        }
-    }
-
-    private fun checkIfItemInSearchHistory(productId: String): SearchHistoryItem? {
-        uiState.value.searchHistory.forEach { item ->
-            if (item.productId == productId) return item
-        }
-        return null
-    }
-
-    private fun upsertItemToSearchHistory(product: Product?) {
-
-        if (product == null) return
-        val itemInSearchHistory = checkIfItemInSearchHistory(product.productId)
-        logger("item in search history :${itemInSearchHistory != null}")
-
-        var itemToAdd: SearchHistoryItem? = itemInSearchHistory?.copy(
-            timeStamp = LocalDateTime.now()
-        )
-        if (itemInSearchHistory == null){
-            uiState.value.user?.id?.let {userId ->
-                itemToAdd = product.toSearchHistoryItem(userId)
-            }
-        }
-        viewModelScope.launch(Dispatchers.IO){
-            logger("adding item with itemId: ${itemToAdd?.id}")
-            itemToAdd?.let {
-                dbRepository.addItemToSearchHistory(it)
-            }
-            delay(500)
-        }
-        updateSearchHistory()
-    }
-    private fun updateSearchHistory(){
-        viewModelScope.launch {
-            var updatedSearchHistory: List<SearchHistoryItem>
-            withContext(Dispatchers.IO){
-                updatedSearchHistory = dbRepository.getSearchHistory().data ?: mutableListOf()
-            }
-            _uiState.update {
-                it.copy(
-                    searchHistory = updatedSearchHistory
-                )
-            }
-        }
-    }
-    private fun getUserDetails() {
-        _uiState.update {
-            it.copy(userDetailsFetchState = UserDetailsFetchState.LOADING)
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-
-            val searchHistory = dbRepository.getSearchHistory().data ?: mutableListOf()
-            val profileDetails = dbRepository.getUserProfileDetails()
-            if (profileDetails is Resource.Success){
-                withContext(Dispatchers.Main){
-                    profileDetails.data?.let {details ->
-                        logger(profileDetails.data.userDetails.userName)
+                is Resource.Loading -> {
+                    _uiState.update {
+                        it.copy(
+                            searchHistoryFetchState = Status.LOADING
+                        )
+                    }
+                }
+                is Resource.Success -> {
+                    result.data?.let {
                         _uiState.update {
                             it.copy(
-                                user = details.userDetails,
-                                searchHistory = searchHistory,
-                                dietaryPreferences = details.userPreferences,
-                                dietaryRestriction = details.userRestrictions,
-                                allergens = details.userAllergen,
-                                userDetailsFetchState = UserDetailsFetchState.SUCCESS
+                                searchHistoryFetchState = Status.SUCCESS,
+                                searchHistory = result.data
+                            )
+                        }
+                        _uiState.update {
+                            it.copy(
+                                searchHistoryFetchState = Status.IDLE
                             )
                         }
                     }
                 }
             }
+        }.launchIn(viewModelScope)
+    }
 
-            logger((profileDetails.data?.userDetails ?: "null").toString())
-            withContext(Dispatchers.Main){
-                _uiState.update {
-                    it.copy(userDetailsFetchState = UserDetailsFetchState.NOT_STARTED)
+    private fun getRecommendedProducts(category: List<String> = emptyList()) {
+        getRecommendedProductsUseCase(categories = category).onEach {result ->
+            when(result){
+                is Resource.Failure -> {
+                    _uiState.update {
+                        it.copy(
+                            recommendedProductsFetchSate = Status.FAILURE,
+                            errorMessage = result.message
+                        )
+                    }
+                    _uiState.update {
+                        it.copy(
+                            recommendedProductsFetchSate = Status.IDLE
+                        )
+                    }
+                }
+                is Resource.Loading -> {
+                    _uiState.update {
+                        it.copy(
+                            recommendedProductsFetchSate = Status.LOADING
+                        )
+                    }
+                }
+                is Resource.Success -> {
+                    result.data?.let { recommendedProducts ->
+                        _uiState.update {
+                            it.copy(
+                                recommendedProductsFetchSate = Status.SUCCESS,
+                                recommendedProducts = recommendedProducts
+                            )
+                        }
+                    }
                 }
             }
         }
     }
 
-
+    private fun getUserDetails() {
+        getUserDetailsUseCase().onEach {result ->
+            when(result){
+                is Resource.Failure -> {
+                    _uiState.update {
+                        it.copy(
+                            userDetailsFetchState = Status.FAILURE,
+                            errorMessage = result.message
+                        )
+                    }
+                    _uiState.update {
+                        it.copy(
+                            userDetailsFetchState = Status.IDLE
+                        )
+                    }
+                }
+                is Resource.Loading -> {
+                    _uiState.update {
+                        it.copy(
+                            userDetailsFetchState = Status.LOADING
+                        )
+                    }
+                }
+                is Resource.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            userDetailsFetchState = Status.SUCCESS,
+                            userProfileDetails = result.data
+                        )
+                    }
+                    _uiState.update {
+                        it.copy(userDetailsFetchState = Status.IDLE)
+                    }
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
 }
 
 
@@ -306,8 +191,9 @@ class HomePageViewModelFactory(private val apiRepository: ApiRepository, private
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HomePageViewModel::class.java)){
             return HomePageViewModel(
-                apiRepository = apiRepository,
-                dbRepository = dbRepository
+                getSearchHistoryUseCase = GetSearchHistoryUseCase(dbRepository),
+                getUserDetailsUseCase = GetUserDetailsUseCase(dbRepository),
+                getRecommendedProductsUseCase = GetRecommendedProductsUseCase(apiRepository, dbRepository)
             ) as T
         }
         throw  IllegalArgumentException("Invalid ViewModel Class")

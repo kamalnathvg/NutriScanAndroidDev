@@ -13,7 +13,7 @@ import com.mdev1008.nutriscanandroiddev.data.dao.UserDietaryRestrictionDao
 import com.mdev1008.nutriscanandroiddev.data.model.SearchHistoryItem
 import com.mdev1008.nutriscanandroiddev.data.model.User
 import com.mdev1008.nutriscanandroiddev.data.model.UserAllergen
-import com.mdev1008.nutriscanandroiddev.data.model.UserDao
+import com.mdev1008.nutriscanandroiddev.data.dao.UserDao
 import com.mdev1008.nutriscanandroiddev.data.model.UserDietaryPreference
 import com.mdev1008.nutriscanandroiddev.data.model.UserDietaryRestriction
 import java.time.LocalDateTime

@@ -7,6 +7,8 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.ProgressBar
+import androidx.annotation.DrawableRes
+import androidx.annotation.IdRes
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
@@ -70,7 +72,7 @@ fun View.showSnackBar(
     snackbar.show()
 }
 
-fun ImageView.loadFromUrlOrGone(imageUrl: String?, errorImage: Drawable? = null){
+fun ImageView.loadFromUrlOrGone(imageUrl: String?, @DrawableRes errorImage: Int? = null){
     if (imageUrl == null && errorImage == null){
         this.visibility = View.GONE
         return
@@ -81,11 +83,3 @@ fun ImageView.loadFromUrlOrGone(imageUrl: String?, errorImage: Drawable? = null)
         .into(this)
 }
 
-fun Activity.showProgressBar(){
-    this.findViewById<View>(R.id.blurBg).show()
-    this.findViewById<ProgressBar>(R.id.progress_bar).show()
-}
-fun Activity.hideProgressBar(){
-    this.findViewById<View>(R.id.blurBg).hide()
-    this.findViewById<ProgressBar>(R.id.progress_bar).hide()
-}

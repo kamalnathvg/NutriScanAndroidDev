@@ -1,31 +1,24 @@
 package com.mdev1008.nutriscanandroiddev.presentation.home_page
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mdev1008.nutriscanandroiddev.NutriScanApplication
-import com.mdev1008.nutriscanandroiddev.R
 import com.mdev1008.nutriscanandroiddev.databinding.FragmentHomePageBinding
-import com.mdev1008.nutriscanandroiddev.data.model.SearchHistoryItem
-import com.mdev1008.nutriscanandroiddev.utils.BarcodeScanner
-import com.mdev1008.nutriscanandroiddev.utils.DemoItems
-import com.mdev1008.nutriscanandroiddev.utils.Resource
-import com.mdev1008.nutriscanandroiddev.utils.greet
-import com.mdev1008.nutriscanandroiddev.utils.hideProgressBar
-import com.mdev1008.nutriscanandroiddev.utils.logger
-import com.mdev1008.nutriscanandroiddev.utils.showProgressBar
+import com.mdev1008.nutriscanandroiddev.data.model.User
+import com.mdev1008.nutriscanandroiddev.data.model.UserProfileDetails
+import com.mdev1008.nutriscanandroiddev.domain.model.RecommendedProductForView
+import com.mdev1008.nutriscanandroiddev.domain.model.SearchHistoryItemForView
+import com.mdev1008.nutriscanandroiddev.utils.Status
+import com.mdev1008.nutriscanandroiddev.utils.infoLogger
 import com.mdev1008.nutriscanandroiddev.utils.showSnackBar
 import kotlinx.coroutines.launch
 
@@ -50,139 +43,105 @@ class HomePage : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewLifecycleOwner.lifecycleScope.launch {
+        if (viewModel.uiState.value.userProfileDetails == null){
             viewModel.emit(HomePageEvent.GetUserDetails)
         }
-        setupScanButton()
-        setupDemoItemButton()
-        setupRecyclerView()
-        manageUiState()
-    }
-
-    private fun setupDemoItemButton(){
-        viewBinding.fabGetDemoItem.setOnClickListener {
-            activity?.showProgressBar()
-            viewModel.emit(HomePageEvent.FetchProductDetails(DemoItems.getRandomItem()))
+        viewBinding.apply {
+            rvHpSearchHistory.adapter = SearchHistoryAdapter(emptyList()){
+                //TODO: Navigate to product details page
+            }
+            rvHpSearchHistory.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            rvRecommendedProduct.adapter = RecommendedProductAdapter(emptyList()){
+                //TODO: Navigate to product details page
+            }
+            rvRecommendedProduct.layoutManager = GridLayoutManager(requireContext(), 2)
         }
+
+        observeUserDetails()
+        observeSearchHistory()
+        observeRecommendedProducts()
     }
 
-    private fun manageUiState() {
+    private fun observeRecommendedProducts() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.uiState.collect{state ->
-                when(state.productDetailsFetchState){
-                    ProductDetailsFetchState.LOADING -> {
-                        logger(state.productDetailsFetchState.name)
-//                        activity?.showProgressBar()
-                    }
-                    ProductDetailsFetchState.SUCCESS -> {
-                        logger(state.productDetailsFetchState.name)
-                        findNavController().navigate(R.id.action_home_page_to_product_details_page)
-                    }
-                    ProductDetailsFetchState.FAILURE -> {
-                        logger(state.productDetailsFetchState.name)
-                        view?.showSnackBar(state.message.toString())
-                    }
-                    ProductDetailsFetchState.NOT_STARTED -> {
-//                        activity?.hideProgressBar()
-                    }
-                }
-
-                when(state.userDetailsFetchState){
-                    UserDetailsFetchState.LOADING -> {
-                        logger(state.userDetailsFetchState.name)
-                        activity?.showProgressBar()
-                    }
-                    UserDetailsFetchState.SUCCESS -> {
-                        logger(state.userDetailsFetchState.name)
-                        updateSearchHistory(state.searchHistory)
-                    }
-                    UserDetailsFetchState.FAILURE -> {
-                        logger(state.userDetailsFetchState.name)
-                    }
-                    UserDetailsFetchState.NOT_STARTED -> {
-
-                        activity?.hideProgressBar()
-                        setupMenuOptions()
-                        logger(state.userDetailsFetchState.name)
-                        logger(state.user?.isProfileCompleted.toString())
-                        if (state.user == null){
-                            findNavController().navigate(R.id.action_home_page_to_sign_in_page)
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+                viewModel.uiState.collect{state->
+                    when(state.recommendedProductsFetchSate){
+                        Status.LOADING -> {
+                            infoLogger("Loading Recommended Products")
                         }
-                        if (state.user?.isProfileCompleted == false){
-                            findNavController().navigate(R.id.action_home_page_to_profile_page)
+                        Status.SUCCESS -> {
+                            updateRecommendedProducts(state.recommendedProducts)
                         }
-                    }
-                }
-
-            }
-        }
-    }
-
-    private fun setupRecyclerView() {
-        logger("building recycler view")
-        val searchHistory = viewModel.uiState.value.searchHistory
-        val searchHistoryAdapter = SearchHistoryAdapter(
-            viewModel,
-            searchHistory,
-            onShowProgress = activity?.showProgressBar(),
-            onHideProgress = activity?.hideProgressBar()
-        )
-        viewBinding.rvSearchHistory.layoutManager = LinearLayoutManager(requireContext())
-        viewBinding.rvSearchHistory.adapter = searchHistoryAdapter
-    }
-    private fun updateSearchHistory(searchHistory: List<SearchHistoryItem>){
-        logger("updating search history")
-        val adapter = viewBinding.rvSearchHistory.adapter as SearchHistoryAdapter
-        adapter.updateData(searchHistory)
-    }
-
-    private fun setupScanButton(){
-        viewBinding.fabScanProduct.setOnClickListener { scanButton ->
-            BarcodeScanner.startScan(requireContext()){result ->
-                when(result){
-                    is Resource.Success -> {
-                        logger("success")
-                        result.data?.let {
-                            viewModel.emit(HomePageEvent.FetchProductDetails(it))
+                        Status.FAILURE -> {
+                            view?.showSnackBar("Error fetching recommended products: ${state.errorMessage}")
                         }
-                    }
-                    is Resource.Failure ->{
-                        logger("failure")
-                        result.message?.let { view?.showSnackBar(it) }
+                        Status.IDLE -> {}
                     }
                 }
             }
         }
     }
 
-    private fun setupMenuOptions() {
-        val userName = viewModel.uiState.value.user?.userName
-        val appCompatActivity = activity as AppCompatActivity
-        viewBinding.mtbHomePage.let { materialToolbar ->
-            appCompatActivity.setSupportActionBar(materialToolbar)
-            materialToolbar.title = userName?.greet()
-            materialToolbar.setTitleTextColor(Color.WHITE)
-        }
-        logger("building HomePage Menu")
-        appCompatActivity.addMenuProvider(object :MenuProvider{
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.homepage_menu,menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when(menuItem.itemId){
-                    R.id.mi_sign_out -> {
-                        viewModel.emit(HomePageEvent.SignOut)
-                        true
+    private fun observeSearchHistory() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+                viewModel.uiState.collect{state->
+                    when(state.searchHistoryFetchState){
+                        Status.LOADING -> {
+                            infoLogger("Loading Search History")
+                        }
+                        Status.SUCCESS -> {
+                            updateSearchHistory(state.searchHistory)
+                        }
+                        Status.FAILURE -> {
+                            view?.showSnackBar("Error fetching search history: ${state.errorMessage}")
+                        }
+                        Status.IDLE -> {}
                     }
-                    R.id.mi_profile ->{
-                        findNavController().navigate(R.id.action_home_page_to_profile_page)
-                        true
-                    }
-                    else -> false
                 }
             }
-        },viewLifecycleOwner)
+        }
+    }
+
+    private fun observeUserDetails() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    when (state.userDetailsFetchState) {
+                        Status.LOADING -> {
+                            infoLogger("Loading user details...")
+                        }
+                        Status.SUCCESS -> {
+                            state.userProfileDetails?.let {
+                                updateUserDetails(it)
+                            }
+                        }
+                        Status.FAILURE -> {
+                            view?.showSnackBar("Error fetching user details: ${state.errorMessage}")
+                        }
+                        Status.IDLE -> {}
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateUserDetails(user: UserProfileDetails){
+        viewBinding.apply {
+            tvHpUserName.text = user.userDetails.userName
+            //TODO: implement rest of dietary preferences and restrictions
+        }
+    }
+
+    private fun updateSearchHistory(searchHistory: List<SearchHistoryItemForView>){
+        val adapter = viewBinding.rvHpSearchHistory.adapter as SearchHistoryAdapter
+        adapter.updateList(searchHistory)
+    }
+
+    private fun updateRecommendedProducts(recommendedProducts: List<RecommendedProductForView>){
+        val adapter = viewBinding.rvRecommendedProduct.adapter as RecommendedProductAdapter
+        adapter.updateList(recommendedProducts)
     }
 }
 
