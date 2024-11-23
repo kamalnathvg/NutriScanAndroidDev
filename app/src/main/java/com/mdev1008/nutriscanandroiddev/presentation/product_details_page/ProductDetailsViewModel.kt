@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.mdev1008.nutriscanandroiddev.NutriScanApplication
-import com.mdev1008.nutriscanandroiddev.data.repository.ApiRepository
 import com.mdev1008.nutriscanandroiddev.domain.model.ProductDetailsForView
 import com.mdev1008.nutriscanandroiddev.domain.usecase.GetProductDetailsByIdUseCase
 import com.mdev1008.nutriscanandroiddev.utils.Resource

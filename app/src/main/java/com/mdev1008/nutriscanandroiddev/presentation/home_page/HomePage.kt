@@ -11,10 +11,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mdev1008.nutriscanandroiddev.NutriScanApplication
-import com.mdev1008.nutriscanandroiddev.databinding.FragmentHomePageBinding
-import com.mdev1008.nutriscanandroiddev.data.model.User
 import com.mdev1008.nutriscanandroiddev.data.model.UserProfileDetails
+import com.mdev1008.nutriscanandroiddev.databinding.FragmentHomePageBinding
 import com.mdev1008.nutriscanandroiddev.domain.model.RecommendedProductForView
 import com.mdev1008.nutriscanandroiddev.domain.model.SearchHistoryItemForView
 import com.mdev1008.nutriscanandroiddev.utils.Status

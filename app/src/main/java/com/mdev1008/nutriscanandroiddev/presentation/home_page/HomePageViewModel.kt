@@ -1,44 +1,24 @@
 package com.mdev1008.nutriscanandroiddev.presentation.home_page
 
-import com.mdev1008.nutriscanandroiddev.data.model.Product
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.mdev1008.nutriscanandroiddev.NutriScanApplication
-import com.mdev1008.nutriscanandroiddev.data.model.SearchHistoryItem
-import com.mdev1008.nutriscanandroiddev.data.model.UserPreferenceConclusion
-import com.mdev1008.nutriscanandroiddev.data.model.User
-import com.mdev1008.nutriscanandroiddev.data.model.UserAllergen
-import com.mdev1008.nutriscanandroiddev.data.model.UserDietaryPreference
-import com.mdev1008.nutriscanandroiddev.data.model.UserDietaryRestriction
 import com.mdev1008.nutriscanandroiddev.data.model.UserProfileDetails
-import com.mdev1008.nutriscanandroiddev.data.model.getConclusion
-import com.mdev1008.nutriscanandroiddev.data.model.toAllergens
-import com.mdev1008.nutriscanandroiddev.data.repository.ApiRepository
-import com.mdev1008.nutriscanandroiddev.data.repository.DbRepository
-import com.mdev1008.nutriscanandroiddev.utils.Resource
-import com.mdev1008.nutriscanandroiddev.data.model.getNutrientsForView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import com.mdev1008.nutriscanandroiddev.data.model.toDietaryRestrictions
-import com.mdev1008.nutriscanandroiddev.data.model.toSearchHistoryItem
 import com.mdev1008.nutriscanandroiddev.domain.model.RecommendedProductForView
 import com.mdev1008.nutriscanandroiddev.domain.model.SearchHistoryItemForView
 import com.mdev1008.nutriscanandroiddev.domain.usecase.GetRecommendedProductsUseCase
 import com.mdev1008.nutriscanandroiddev.domain.usecase.GetSearchHistoryUseCase
 import com.mdev1008.nutriscanandroiddev.domain.usecase.GetUserDetailsUseCase
+import com.mdev1008.nutriscanandroiddev.utils.Resource
 import com.mdev1008.nutriscanandroiddev.utils.Status
-import com.mdev1008.nutriscanandroiddev.utils.infoLogger
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import java.time.LocalDateTime
+import kotlinx.coroutines.flow.update
 
 data class HomePageState(
     val userDetailsFetchState: Status = Status.IDLE,

@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.mdev1008.nutriscanandroiddev.NutriScanApplication
 import com.mdev1008.nutriscanandroiddev.data.model.UserProfileDetails
-import com.mdev1008.nutriscanandroiddev.data.repository.DbRepository
 import com.mdev1008.nutriscanandroiddev.domain.usecase.GetUserDetailsUseCase
 import com.mdev1008.nutriscanandroiddev.domain.usecase.SkipUserProfileSetupUseCase
 import com.mdev1008.nutriscanandroiddev.domain.usecase.UpdateUserDetailsUseCase

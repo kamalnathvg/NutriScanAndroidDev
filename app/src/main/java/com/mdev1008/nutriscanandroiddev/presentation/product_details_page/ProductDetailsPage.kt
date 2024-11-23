@@ -1,6 +1,5 @@
 package com.mdev1008.nutriscanandroiddev.presentation.product_details_page
 
-import com.mdev1008.nutriscanandroiddev.data.model.Product
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,16 +14,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.mdev1008.nutriscanandroiddev.R
+import com.mdev1008.nutriscanandroiddev.data.model.NutrientCategory
 import com.mdev1008.nutriscanandroiddev.databinding.FragmentProductDetailsPageBinding
 import com.mdev1008.nutriscanandroiddev.domain.model.MainDetailsForView
-import com.mdev1008.nutriscanandroiddev.data.model.NutrientCategory
 import com.mdev1008.nutriscanandroiddev.domain.model.NutrientForView
-import com.mdev1008.nutriscanandroiddev.utils.getIcon
-import com.mdev1008.nutriscanandroiddev.utils.getIconAndBg
-import com.mdev1008.nutriscanandroiddev.utils.loadFromUrlOrGone
 import com.mdev1008.nutriscanandroiddev.domain.model.ProductDetailsForView
 import com.mdev1008.nutriscanandroiddev.utils.Status
+import com.mdev1008.nutriscanandroiddev.utils.getIcon
+import com.mdev1008.nutriscanandroiddev.utils.getIconAndBg
 import com.mdev1008.nutriscanandroiddev.utils.infoLogger
+import com.mdev1008.nutriscanandroiddev.utils.loadFromUrlOrGone
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -115,7 +114,8 @@ class ProductDetailsPage : Fragment() {
             nutrientItemView.findViewById<TextView>(R.id.tv_nutrient_description).text = nutrient.description
             val (healthCategoryIcon, _) = nutrient.healthCategory.getIconAndBg(requireContext())
             nutrientItemView.findViewById<ImageView>(R.id.nutrient_category_icon).setImageResource(healthCategoryIcon)
-            nutrientItemView.findViewById<TextView>(R.id.tv_per_hundred_gram).text = "${nutrient.contentPerHundredGrams} ${nutrient.servingUnit}"
+            val contentText = nutrient.contentPerHundredGrams.toString() + " " + nutrient.servingUnit
+            nutrientItemView.findViewById<TextView>(R.id.tv_per_hundred_gram).text = contentText
             viewBindingLayout.llProductDetailsLayout.addView(nutrientItemView)
         }
     }

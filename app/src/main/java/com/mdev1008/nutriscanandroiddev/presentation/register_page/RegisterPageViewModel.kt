@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.mdev1008.nutriscanandroiddev.NutriScanApplication
-import com.mdev1008.nutriscanandroiddev.data.repository.DbRepository
 import com.mdev1008.nutriscanandroiddev.domain.usecase.RegisterUseCase
 import com.mdev1008.nutriscanandroiddev.utils.Resource
 import com.mdev1008.nutriscanandroiddev.utils.Status
