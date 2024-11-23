@@ -66,8 +66,8 @@ class ProductDetailsPage : Fragment() {
                         infoLogger("Loading product details")
                     }
                     Status.SUCCESS -> {
-                        state.productDetailsForView?.let { productDetailsForView ->
-                            buildProductDetailsUi(state.productDetailsForView)
+                        state.productDetailsForView?.let {
+                            buildProductDetailsUi(it)
                         }
                     }
                     Status.FAILURE -> TODO()

@@ -1,9 +1,12 @@
 package com.mdev1008.nutriscanandroiddev.presentation.profile_page
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.mdev1008.nutriscanandroiddev.data.model.UserProfileDetails
+import com.mdev1008.nutriscanandroiddev.data.repository.DbRepository
 import com.mdev1008.nutriscanandroiddev.domain.usecase.GetUserDetailsUseCase
+import com.mdev1008.nutriscanandroiddev.domain.usecase.SkipUserProfileSetupUseCase
 import com.mdev1008.nutriscanandroiddev.domain.usecase.UpdateUserDetailsUseCase
 import com.mdev1008.nutriscanandroiddev.utils.Resource
 import com.mdev1008.nutriscanandroiddev.utils.Status
@@ -23,7 +26,8 @@ data class ProfilePageState(
 
 class ProfilePageViewModel(
     private val updateUserDetailsUseCase: UpdateUserDetailsUseCase,
-    private val getUserDetailsUseCase: GetUserDetailsUseCase
+    private val getUserDetailsUseCase: GetUserDetailsUseCase,
+    private val skipUserProfileSetupUseCase: SkipUserProfileSetupUseCase
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfilePageState())
@@ -34,7 +38,12 @@ class ProfilePageViewModel(
         when(event){
             is ProfilePageEvent.GetUserDetails -> getUserDetails()
             is ProfilePageEvent.UpdateUserDetails -> updateUserDetails(event.userProfileDetails)
+            is ProfilePageEvent.SkipProfileSetup -> skipProfileSetup()
         }
+    }
+
+    private fun skipProfileSetup() {
+        skipUserProfileSetupUseCase()
     }
 
     private fun updateUserDetails(userProfileDetails: UserProfileDetails) {
@@ -116,4 +125,18 @@ class ProfilePageViewModel(
         }.launchIn(viewModelScope)
     }
 
+}
+
+
+class ProfilePageViewModelFactory(private val dbRepository: DbRepository): ViewModelProvider.Factory{
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(ProfilePageViewModel::class.java)){
+            return ProfilePageViewModel(
+                getUserDetailsUseCase = GetUserDetailsUseCase(dbRepository),
+                updateUserDetailsUseCase = UpdateUserDetailsUseCase(dbRepository),
+                skipUserProfileSetupUseCase = SkipUserProfileSetupUseCase(dbRepository)
+            ) as T
+        }
+        throw IllegalArgumentException("Invalid ViewModel Class")
+    }
 }
