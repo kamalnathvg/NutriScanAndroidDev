@@ -127,7 +127,7 @@ class HomePageViewModel(
                     }
                 }
             }
-        }
+        }.launchIn(viewModelScope)
     }
 
     private fun getUserDetails() {
