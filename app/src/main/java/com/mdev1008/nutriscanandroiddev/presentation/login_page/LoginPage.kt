@@ -11,7 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.mdev1008.nutriscanandroiddev.R
-import com.mdev1008.nutriscanandroiddev.databinding.FragmentSignInPageBinding
+import com.mdev1008.nutriscanandroiddev.databinding.FragmentLoginPageBinding
 import com.mdev1008.nutriscanandroiddev.utils.Status
 import com.mdev1008.nutriscanandroiddev.utils.hideKeyboard
 import com.mdev1008.nutriscanandroiddev.utils.isValidPassword
@@ -27,13 +27,13 @@ class LoginPage : Fragment() {
         LoginViewModel.Factory
     }
 
-    private lateinit var viewBinding: FragmentSignInPageBinding
+    private lateinit var viewBinding: FragmentLoginPageBinding
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewBinding = FragmentSignInPageBinding.inflate(inflater, container, false)
+        viewBinding = FragmentLoginPageBinding.inflate(inflater, container, false)
         return viewBinding.root
     }
 
@@ -46,7 +46,7 @@ class LoginPage : Fragment() {
         }
 
         viewBinding.tvRegister.setOnClickListener {
-            findNavController().navigate(R.id.action_sign_in_page_to_register_page)
+            findNavController().navigate(R.id.action_login_page_to_register_page)
         }
         viewBinding.btnSignIn.setOnClickListener {
             view.hideKeyboard()
@@ -68,7 +68,7 @@ class LoginPage : Fragment() {
                     Status.SUCCESS -> {
                         debugLogger(state.loginState.name)
 //                        findNavController().navigate(R.id.action_sign_in_page_to_home_page)
-                        findNavController().popBackStack()
+                        findNavController().navigate(R.id.action_login_page_to_home_page)
                     }
                     Status.FAILURE -> {
                         errorLogger(state.loginState.name)

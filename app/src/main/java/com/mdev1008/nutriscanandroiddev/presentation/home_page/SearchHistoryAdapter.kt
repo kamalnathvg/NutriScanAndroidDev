@@ -30,7 +30,7 @@ class SearchHistoryAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchHistoryViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.component_hp_recommended_item, parent,false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.component_hmp_recommended_item, parent,false)
         return  SearchHistoryViewHolder(view)
     }
 

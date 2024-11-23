@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/home_page"
+    app:startDestination="@id/login_page"
     >
     <fragment
         android:id="@+id/register_page"
@@ -12,19 +12,21 @@
         tools:layout="@layout/fragment_register_page">
     </fragment>
     <fragment
-        android:id="@+id/sign_in_page"
+        android:id="@+id/login_page"
         android:name="com.mdev1008.nutriscanandroiddev.presentation.login_page.LoginPage"
-        android:label="SignInPage"
-        tools:layout="@layout/fragment_sign_in_page" >
+        android:label="LoginPage"
+        tools:layout="@layout/fragment_login_page" >
         <action
-            android:id="@+id/action_sign_in_page_to_register_page"
+            android:id="@+id/action_login_page_to_register_page"
             app:destination="@id/register_page" />
-        <action
-            android:id="@+id/action_sign_in_page_to_home_page"
-            app:destination="@id/home_page" />
         <action
             android:id="@+id/action_sign_in_page_to_profile_page"
             app:destination="@id/profile_page" />
+        <action
+            android:id="@+id/action_login_page_to_home_page"
+            app:popUpTo="@id/login_page"
+            app:popUpToInclusive="true"
+            app:destination="@id/home_page"/>
     </fragment>
 
     <fragment
@@ -33,14 +35,24 @@
         android:label="HomePage"
         tools:layout="@layout/fragment_home_page">
         <action
-            android:id="@+id/action_home_page_to_sign_in_page"
-            app:destination="@id/sign_in_page" />
+            android:id="@+id/action_home_page_to_login_page"
+            app:popUpTo="@id/home_page"
+            app:popUpToInclusive="true"
+            app:destination="@id/login_page" />
         <action
             android:id="@+id/action_home_page_to_product_details_page"
             app:destination="@id/product_details_page" />
         <action
             android:id="@+id/action_home_page_to_profile_page"
             app:destination="@id/profile_page" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/history_page"
+        android:name="com.mdev1008.nutriscanandroiddev.presentation.history_page.HistoryPage"
+        android:label="HistoryPage"
+        tools:layout="@layout/fragment_history_page">
+
     </fragment>
     <fragment
         android:id="@+id/profile_page"

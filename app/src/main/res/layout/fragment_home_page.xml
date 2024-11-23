@@ -102,7 +102,7 @@
         tools:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:orientation="horizontal"
         tools:itemCount="4"
-        tools:listitem="@layout/component_hp_history_item"
+        tools:listitem="@layout/component_hmp_history_item"
         tools:visibility="visible" />
 
     <TextView
@@ -123,7 +123,7 @@
         tools:spanCount="2"
         android:orientation="vertical"
         tools:itemCount="4"
-        tools:listitem="@layout/component_hp_recommended_item"
+        tools:listitem="@layout/component_hmp_recommended_item"
         tools:visibility="visible" />
 
 </LinearLayout>
