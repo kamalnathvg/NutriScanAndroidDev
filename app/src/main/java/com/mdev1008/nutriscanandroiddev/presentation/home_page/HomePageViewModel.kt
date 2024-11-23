@@ -3,7 +3,10 @@ package com.mdev1008.nutriscanandroiddev.presentation.home_page
 import com.mdev1008.nutriscanandroiddev.data.model.Product
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
+import com.mdev1008.nutriscanandroiddev.NutriScanApplication
 import com.mdev1008.nutriscanandroiddev.data.model.SearchHistoryItem
 import com.mdev1008.nutriscanandroiddev.data.model.UserPreferenceConclusion
 import com.mdev1008.nutriscanandroiddev.data.model.User
@@ -184,18 +187,22 @@ class HomePageViewModel(
             }
         }.launchIn(viewModelScope)
     }
-}
-
-
-class HomePageViewModelFactory(private val apiRepository: ApiRepository, private val dbRepository: DbRepository): ViewModelProvider.Factory{
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(HomePageViewModel::class.java)){
-            return HomePageViewModel(
-                getSearchHistoryUseCase = GetSearchHistoryUseCase(dbRepository),
-                getUserDetailsUseCase = GetUserDetailsUseCase(dbRepository),
-                getRecommendedProductsUseCase = GetRecommendedProductsUseCase(apiRepository, dbRepository)
-            ) as T
+    companion object{
+        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory{
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+                if (modelClass.isAssignableFrom(HomePageViewModel::class.java)){
+                    val application = checkNotNull(extras[APPLICATION_KEY])
+                    val dbRepository = (application as NutriScanApplication).dbRepository
+                    val apiRepository = application.apiRepository
+                    return HomePageViewModel(
+                        getSearchHistoryUseCase = GetSearchHistoryUseCase(dbRepository),
+                        getUserDetailsUseCase = GetUserDetailsUseCase(dbRepository),
+                        getRecommendedProductsUseCase = GetRecommendedProductsUseCase(apiRepository, dbRepository)
+                    ) as T
+                }
+                throw  IllegalArgumentException("Invalid ViewModel Class")
+            }
         }
-        throw  IllegalArgumentException("Invalid ViewModel Class")
     }
 }

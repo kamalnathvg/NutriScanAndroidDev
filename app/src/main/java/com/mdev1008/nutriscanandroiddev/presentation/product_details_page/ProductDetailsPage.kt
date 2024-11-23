@@ -14,13 +14,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
-import com.mdev1008.nutriscanandroiddev.NutriScanApplication
 import com.mdev1008.nutriscanandroiddev.R
 import com.mdev1008.nutriscanandroiddev.databinding.FragmentProductDetailsPageBinding
 import com.mdev1008.nutriscanandroiddev.domain.model.MainDetailsForView
 import com.mdev1008.nutriscanandroiddev.data.model.NutrientCategory
 import com.mdev1008.nutriscanandroiddev.domain.model.NutrientForView
-import com.mdev1008.nutriscanandroiddev.presentation.home_page.HomePageViewModelFactory
 import com.mdev1008.nutriscanandroiddev.utils.getIcon
 import com.mdev1008.nutriscanandroiddev.utils.getIconAndBg
 import com.mdev1008.nutriscanandroiddev.utils.loadFromUrlOrGone
@@ -33,11 +31,7 @@ import kotlinx.coroutines.launch
 class ProductDetailsPage : Fragment() {
 
     private val viewModel by activityViewModels<ProductDetailsViewModel> {
-        val nutriScanApplication = requireActivity().application as NutriScanApplication
-        HomePageViewModelFactory(
-            apiRepository = nutriScanApplication.apiRepository,
-            dbRepository = nutriScanApplication.dbRepository
-        )
+        ProductDetailsViewModel.Factory
     }
     private lateinit var viewBindingLayout: FragmentProductDetailsPageBinding
     override fun onCreateView(

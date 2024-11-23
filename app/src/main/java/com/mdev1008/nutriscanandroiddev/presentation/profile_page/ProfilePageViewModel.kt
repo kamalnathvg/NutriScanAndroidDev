@@ -2,7 +2,10 @@ package com.mdev1008.nutriscanandroiddev.presentation.profile_page
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
+import com.mdev1008.nutriscanandroiddev.NutriScanApplication
 import com.mdev1008.nutriscanandroiddev.data.model.UserProfileDetails
 import com.mdev1008.nutriscanandroiddev.data.repository.DbRepository
 import com.mdev1008.nutriscanandroiddev.domain.usecase.GetUserDetailsUseCase
@@ -125,18 +128,21 @@ class ProfilePageViewModel(
         }.launchIn(viewModelScope)
     }
 
-}
-
-
-class ProfilePageViewModelFactory(private val dbRepository: DbRepository): ViewModelProvider.Factory{
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ProfilePageViewModel::class.java)){
-            return ProfilePageViewModel(
-                getUserDetailsUseCase = GetUserDetailsUseCase(dbRepository),
-                updateUserDetailsUseCase = UpdateUserDetailsUseCase(dbRepository),
-                skipUserProfileSetupUseCase = SkipUserProfileSetupUseCase(dbRepository)
-            ) as T
+    companion object{
+        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory{
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+                if (modelClass.isAssignableFrom(ProfilePageViewModel::class.java)){
+                    val application = checkNotNull(extras[APPLICATION_KEY])
+                    val dbRepository = (application as NutriScanApplication).dbRepository
+                    return ProfilePageViewModel(
+                        getUserDetailsUseCase = GetUserDetailsUseCase(dbRepository),
+                        updateUserDetailsUseCase = UpdateUserDetailsUseCase(dbRepository),
+                        skipUserProfileSetupUseCase = SkipUserProfileSetupUseCase(dbRepository)
+                    ) as T
+                }
+                throw IllegalArgumentException("Invalid ViewModel Class")
+            }
         }
-        throw IllegalArgumentException("Invalid ViewModel Class")
     }
 }

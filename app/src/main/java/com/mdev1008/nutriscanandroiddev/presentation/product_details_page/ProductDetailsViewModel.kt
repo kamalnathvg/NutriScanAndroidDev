@@ -2,7 +2,10 @@ package com.mdev1008.nutriscanandroiddev.presentation.product_details_page
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
+import com.mdev1008.nutriscanandroiddev.NutriScanApplication
 import com.mdev1008.nutriscanandroiddev.data.repository.ApiRepository
 import com.mdev1008.nutriscanandroiddev.domain.model.ProductDetailsForView
 import com.mdev1008.nutriscanandroiddev.domain.usecase.GetProductDetailsByIdUseCase
@@ -71,16 +74,21 @@ class ProductDetailsViewModel(
             }
         }.launchIn(viewModelScope)
     }
-}
 
-class ProductDetailsViewModelFactory(private val apiRepository: ApiRepository): ViewModelProvider.Factory{
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ProductDetailsViewModel::class.java)){
-            val getProductDetailsByIdUseCase = GetProductDetailsByIdUseCase(apiRepository)
-            return ProductDetailsViewModel(
-                getProductDetailsByIdUseCase = getProductDetailsByIdUseCase
-            ) as T
+    companion object{
+        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory{
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+                if (modelClass.isAssignableFrom(ProductDetailsViewModel::class.java)){
+                    val application = checkNotNull(extras[APPLICATION_KEY])
+                    val apiRepository = (application as NutriScanApplication).apiRepository
+                    val getProductDetailsByIdUseCase = GetProductDetailsByIdUseCase(apiRepository)
+                    return ProductDetailsViewModel(
+                        getProductDetailsByIdUseCase = getProductDetailsByIdUseCase
+                    ) as T
+                }
+                throw IllegalArgumentException("Invalid ViewModel Class")
+            }
         }
-        throw IllegalArgumentException("Invalid ViewModel Class")
     }
 }

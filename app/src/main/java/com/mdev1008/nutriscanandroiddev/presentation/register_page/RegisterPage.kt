@@ -13,10 +13,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.mdev1008.nutriscanandroiddev.NutriScanApplication
 import com.mdev1008.nutriscanandroiddev.R
 import com.mdev1008.nutriscanandroiddev.databinding.FragmentRegisterPageBinding
-import com.mdev1008.nutriscanandroiddev.pages.authpages.AuthEvent
-import com.mdev1008.nutriscanandroiddev.pages.authpages.AuthViewModel
-import com.mdev1008.nutriscanandroiddev.pages.authpages.AuthViewModelFactory
-import com.mdev1008.nutriscanandroiddev.pages.authpages.RegisterState
+import com.mdev1008.nutriscanandroiddev.utils.Status
 import com.mdev1008.nutriscanandroiddev.utils.hideKeyboard
 import com.mdev1008.nutriscanandroiddev.utils.isValidPassword
 import com.mdev1008.nutriscanandroiddev.utils.isValidUserName
@@ -26,14 +23,14 @@ import kotlinx.coroutines.launch
 class RegisterPage : Fragment() {
 
     private lateinit var viewBinding: FragmentRegisterPageBinding
-    private val viewModel: AuthViewModel by activityViewModels<AuthViewModel> {
-        AuthViewModelFactory((requireActivity().application as NutriScanApplication).dbRepository)
+    private val viewModel: RegisterPageViewModel by activityViewModels<RegisterPageViewModel> {
+        RegisterPageViewModel.Factory
     }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         viewBinding = FragmentRegisterPageBinding.inflate(inflater, container, false)
         return viewBinding.root
     }
@@ -72,15 +69,14 @@ class RegisterPage : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState.collect{state ->
                 when(state.registerState){
-                    RegisterState.LOADING -> {}
-                    RegisterState.SUCCESS -> {
-                        view.showSnackBar(state.message)
+                    Status.LOADING -> {}
+                    Status.SUCCESS -> {
                         findNavController().popBackStack()
                     }
-                    RegisterState.FAILURE -> {
-                        view.showSnackBar(state.message)
+                    Status.FAILURE -> {
+                        view.showSnackBar(state.errorMessage.toString())
                     }
-                    RegisterState.NOT_STARTED -> {}
+                    Status.IDLE -> {}
                 }
             }
         }
@@ -101,7 +97,7 @@ class RegisterPage : Fragment() {
             viewBinding.tilRegisterPassword.error = getString(R.string.password_mismatch_message)
             viewBinding.tilRegisterConfirmPassword.error = getString(R.string.password_mismatch_message)
         }else{
-            viewModel.emit(AuthEvent.RegisterWithUserNamePassword(userName, password))
+            viewModel.onEvent(RegisterPageEvent.RegisterWithUserNamePassword(userName, password))
         }
     }
 }

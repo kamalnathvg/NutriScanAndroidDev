@@ -10,16 +10,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
-import com.mdev1008.nutriscanandroiddev.NutriScanApplication
 import com.mdev1008.nutriscanandroiddev.R
 import com.mdev1008.nutriscanandroiddev.databinding.FragmentSignInPageBinding
-import com.mdev1008.nutriscanandroiddev.pages.authpages.AuthEvent
-import com.mdev1008.nutriscanandroiddev.pages.authpages.AuthViewModel
-import com.mdev1008.nutriscanandroiddev.pages.authpages.AuthViewModelFactory
-import com.mdev1008.nutriscanandroiddev.pages.authpages.SignInState
-import com.mdev1008.nutriscanandroiddev.presentation.home_page.HomePageEvent
-import com.mdev1008.nutriscanandroiddev.presentation.home_page.HomePageViewModel
-import com.mdev1008.nutriscanandroiddev.presentation.home_page.HomePageViewModelFactory
+import com.mdev1008.nutriscanandroiddev.utils.Status
 import com.mdev1008.nutriscanandroiddev.utils.hideKeyboard
 import com.mdev1008.nutriscanandroiddev.utils.isValidPassword
 import com.mdev1008.nutriscanandroiddev.utils.isValidUserName
@@ -30,17 +23,10 @@ import kotlinx.coroutines.launch
 
 class LoginPage : Fragment() {
 
+    private val viewModel: LoginViewModel by activityViewModels<LoginViewModel> {
+        LoginViewModel.Factory
+    }
 
-    private val viewModel: AuthViewModel by activityViewModels<AuthViewModel> {
-        AuthViewModelFactory((requireActivity().application as NutriScanApplication).dbRepository)
-    }
-    private val homepageViewModel by activityViewModels<HomePageViewModel> {
-        val nutriScanApplication = requireActivity().application as NutriScanApplication
-        HomePageViewModelFactory(
-            apiRepository = nutriScanApplication.apiRepository,
-            dbRepository = nutriScanApplication.dbRepository
-        )
-    }
     private lateinit var viewBinding: FragmentSignInPageBinding
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,22 +61,20 @@ class LoginPage : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState.collect{state ->
-                when(state.signInState){
-                    SignInState.LOADING -> {
-                        debugLogger(state.signInState.name)
+                when(state.loginState){
+                    Status.LOADING -> {
+                        debugLogger(state.loginState.name)
                     }
-                    SignInState.SUCCESS -> {
-                        debugLogger(state.signInState.name)
-                        view.showSnackBar(state.message, Snackbar.LENGTH_LONG)
+                    Status.SUCCESS -> {
+                        debugLogger(state.loginState.name)
 //                        findNavController().navigate(R.id.action_sign_in_page_to_home_page)
-                        homepageViewModel.emit(HomePageEvent.GetUserDetails)
                         findNavController().popBackStack()
                     }
-                    SignInState.FAILURE -> {
-                        errorLogger(state.signInState.name)
-                        view.showSnackBar(state.message, Snackbar.LENGTH_LONG)
+                    Status.FAILURE -> {
+                        errorLogger(state.loginState.name)
+                        view.showSnackBar(state.errorMessage.toString(), Snackbar.LENGTH_LONG)
                     }
-                    SignInState.NOT_STARTED -> {}
+                    Status.IDLE -> {}
                 }
             }
         }
@@ -105,7 +89,7 @@ class LoginPage : Fragment() {
         }else if (!isValidPassword){
             viewBinding.tilPassword.error = passwordMessage
         }else{
-            viewModel.emit(AuthEvent.SignInWithUserNamePassword(userName, password))
+            viewModel.onEvent(LoginPageEvent.LoginWithUserNamePassword(userName, password))
         }
     }
 }

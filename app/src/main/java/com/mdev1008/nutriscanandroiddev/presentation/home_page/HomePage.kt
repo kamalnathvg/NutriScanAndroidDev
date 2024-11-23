@@ -25,11 +25,7 @@ import kotlinx.coroutines.launch
 class HomePage : Fragment() {
 
     private val viewModel by activityViewModels<HomePageViewModel> {
-        val nutriScanApplication = requireActivity().application as NutriScanApplication
-        HomePageViewModelFactory(
-            apiRepository = nutriScanApplication.apiRepository,
-            dbRepository = nutriScanApplication.dbRepository
-        )
+        HomePageViewModel.Factory
     }
     private lateinit var viewBinding: FragmentHomePageBinding
     override fun onCreateView(

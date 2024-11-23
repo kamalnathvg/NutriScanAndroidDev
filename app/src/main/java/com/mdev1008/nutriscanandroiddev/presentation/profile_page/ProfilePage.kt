@@ -23,7 +23,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.mdev1008.nutriscanandroiddev.NutriScanApplication
 import com.mdev1008.nutriscanandroiddev.R
 import com.mdev1008.nutriscanandroiddev.databinding.FragmentProfilePageBinding
 import com.mdev1008.nutriscanandroiddev.data.model.NutrientType
@@ -40,9 +39,6 @@ import com.mdev1008.nutriscanandroiddev.data.model.getPreference
 import com.mdev1008.nutriscanandroiddev.data.model.removeAllergen
 import com.mdev1008.nutriscanandroiddev.data.model.removeRestriction
 import com.mdev1008.nutriscanandroiddev.data.model.upsertPreference
-import com.mdev1008.nutriscanandroiddev.presentation.home_page.HomePageEvent
-import com.mdev1008.nutriscanandroiddev.presentation.home_page.HomePageViewModel
-import com.mdev1008.nutriscanandroiddev.presentation.home_page.HomePageViewModelFactory
 import com.mdev1008.nutriscanandroiddev.utils.hide
 import com.mdev1008.nutriscanandroiddev.utils.isValidUserName
 import com.mdev1008.nutriscanandroiddev.utils.debugLogger
@@ -60,10 +56,7 @@ class ProfilePage : Fragment() {
     private lateinit var dietaryRestriction:  MutableList<UserDietaryRestriction>
     private lateinit var allergens:  MutableList<UserAllergen>
     private val viewModel by activityViewModels<ProfilePageViewModel> {
-        val nutriScanApplication = requireActivity().application as NutriScanApplication
-        ProfilePageViewModelFactory(
-            dbRepository = nutriScanApplication.dbRepository
-        )
+        ProfilePageViewModel.Factory
     }
     override fun onCreateView(
         inflater: LayoutInflater,
