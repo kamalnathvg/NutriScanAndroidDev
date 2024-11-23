@@ -128,7 +128,7 @@ class ProductDetailsPage : Fragment() {
         mainHeaderView.findViewById<ImageView>(R.id.iv_product_image).loadFromUrlOrGone(mainDetailsForView.imageUrl)
         mainHeaderView.findViewById<TextView>(R.id.tv_product_name).text = mainDetailsForView.productName
         mainHeaderView.findViewById<TextView>(R.id.tv_product_brand).text = mainDetailsForView.productBrand
-        mainHeaderView.findViewById<TextView>(R.id.tv_product_health_grade).text = mainDetailsForView.healthCategory?.description
+        mainHeaderView.findViewById<TextView>(R.id.tv_product_health_grade).text = mainDetailsForView.healthCategory.description
 //        mainHeaderView.findViewById<TextView>(R.id.tv_dietary_preference_conclusion).text = conclusions.userDietaryPreferenceConclusion
 //        mainHeaderView.findViewById<TextView>(R.id.tv_dietary_restriction_conclusion).text = conclusions.userDietaryRestrictionConclusion
 //        mainHeaderView.findViewById<TextView>(R.id.tv_allergen_conclusion).text = conclusions.userAllergenConclusion
