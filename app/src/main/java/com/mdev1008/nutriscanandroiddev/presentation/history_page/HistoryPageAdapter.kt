@@ -1,5 +1,6 @@
 package com.mdev1008.nutriscanandroiddev.presentation.history_page
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,12 +12,13 @@ import com.mdev1008.nutriscanandroiddev.R
 import com.mdev1008.nutriscanandroiddev.domain.model.SearchHistoryItemForView
 import com.mdev1008.nutriscanandroiddev.utils.getDurationTillNow
 import com.mdev1008.nutriscanandroiddev.utils.getIconAndBg
+import com.mdev1008.nutriscanandroiddev.utils.infoLogger
 import com.mdev1008.nutriscanandroiddev.utils.loadFromUrlOrGone
 import com.mdev1008.nutriscanandroiddev.utils.toReadableString
 
-class HistoryPageAdapter(private val searchHistory: List<SearchHistoryItemForView>) :
+class HistoryPageAdapter(private var searchHistory: List<SearchHistoryItemForView>) :
     RecyclerView.Adapter<HistoryPageAdapter.HistoryPageViewHolder>() {
-    private val filteredList: List<SearchHistoryItemForView> = searchHistory
+    private var filteredList: List<SearchHistoryItemForView> = searchHistory
 
     inner class HistoryPageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val ivProductImage: ImageView = itemView.findViewById(R.id.iv_hsp_product_image)
@@ -48,6 +50,27 @@ class HistoryPageAdapter(private val searchHistory: List<SearchHistoryItemForVie
             val (icon, _) = item.healthCategory.getIconAndBg(ivHealthCategory.context)
             ivHealthCategory.setImageResource(icon)
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateData(newList: List<SearchHistoryItemForView>){
+        this.searchHistory = newList
+        this.filteredList = newList
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun filter(query: String){
+        infoLogger("filtering with query $query")
+        this.filteredList = if (query.isEmpty()) this.searchHistory
+        else{
+            this.searchHistory.filter {
+                it.productName.contains(query, true) ||
+                        it.productBrand?.contains(query, true) ?: false
+            }
+        }
+        infoLogger("found ${this.filteredList} items")
+        notifyDataSetChanged()
     }
 
 }
