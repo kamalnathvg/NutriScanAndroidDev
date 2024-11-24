@@ -109,20 +109,20 @@ class ProfilePageViewModel(
                 is Resource.Loading -> {
                     _uiState.update {
                         it.copy(
-                            updateUserDetailsState = Status.LOADING
+                            userDetailsFetchState = Status.LOADING
                         )
                     }
                 }
                 is Resource.Success -> {
                     _uiState.update {
                         it.copy(
-                            updateUserDetailsState = Status.SUCCESS,
+                            userDetailsFetchState = Status.SUCCESS,
                             userProfileDetails = result.data
                         )
                     }
                     _uiState.update {
                         it.copy(
-                            updateUserDetailsState = Status.IDLE
+                            userDetailsFetchState = Status.IDLE
                         )
                     }
                 }

@@ -6,7 +6,6 @@ import com.mdev1008.nutriscanandroiddev.data.ApiRequests
 import com.mdev1008.nutriscanandroiddev.data.model.Allergen
 import com.mdev1008.nutriscanandroiddev.data.model.DietaryRestriction
 import com.mdev1008.nutriscanandroiddev.data.model.RecommendedProductsResponseDto
-import com.mdev1008.nutriscanandroiddev.data.model.UserDietaryPreference
 import com.mdev1008.nutriscanandroiddev.utils.AppResources
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

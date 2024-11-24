@@ -17,8 +17,8 @@ class DbRepository(private val db: AppDatabase) {
     fun getCurrentUser() = currentUser
 
     private fun updateCurrentUser(){
-        currentUser?.let {
-            currentUser = getUser(it.userName)
+        currentUser?.id?.let { id ->
+            currentUser = getUserById(id)
         }
     }
 
@@ -69,6 +69,9 @@ class DbRepository(private val db: AppDatabase) {
         val users =  db.userDao().getUser(userName)
         return users.isNotEmpty()
     }
+    private fun getUserById(id: Int): User?{
+        return db.userDao().getUserById(id).getOrNull(0)
+    }
 
     private fun getUser(userName: String): User?{
         return db.userDao().getUser(userName).getOrNull(0)
@@ -82,15 +85,24 @@ class DbRepository(private val db: AppDatabase) {
             val searchHistory = db.searchHistoryDao().getUserSearchHistory(userId = userId)
             return Resource.Success(searchHistory)
         }
-
         return Resource.Failure("Unknown Error Occurred")
     }
     fun addItemToSearchHistory(searchHistoryItem: SearchHistoryItem): Resource<String>{
         if (currentUser == null) return Resource.Failure("Not Signed In")
 
-        currentUser?.id?.let {
-            db.searchHistoryDao().addItem(searchHistoryItem)
-            return Resource.Success("Item Added to Search History")
+        currentUser?.id?.let {userId ->
+            if (searchHistoryItem.id != null){
+                db.searchHistoryDao().addItem(searchHistoryItem.copy(userId = userId))
+                return Resource.Success("Item Added to Search History")
+            }
+            val currentItemInHistory = db.searchHistoryDao().getUserSearchHistory(userId).filter { it.productId == searchHistoryItem.productId }.getOrNull(0)
+            db.searchHistoryDao().addItem(
+                searchHistoryItem.copy(
+                    id = currentItemInHistory?.id,
+                    userId = userId
+                )
+            )
+
         }
         return Resource.Failure("Unknown Error Occurred")
     }

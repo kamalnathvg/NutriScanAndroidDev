@@ -13,6 +13,9 @@ interface UserDao {
     @Query("SELECT * FROM user WHERE username = :userName")
     fun getUser(userName: String): List<User>
 
+    @Query("SELECT * FROM user WHERE user_id = :id")
+    fun getUserById(id: Int): List<User>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun createUser(user: User)
 

@@ -23,6 +23,7 @@ class AppResources {
             "nutriscore_grade",
             "categories_hierarchy",
             "allergens_hierarchy",
+            "additives_original_tags",
             "ingredients_analysis_tags",
             )
 

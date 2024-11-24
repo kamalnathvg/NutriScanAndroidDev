@@ -5,11 +5,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mdev1008.nutriscanandroiddev.R
 import com.mdev1008.nutriscanandroiddev.databinding.FragmentHistoryPageBinding
 import com.mdev1008.nutriscanandroiddev.presentation.home_page.SearchHistoryAdapter
 import com.mdev1008.nutriscanandroiddev.utils.Status
@@ -31,8 +34,14 @@ class HistoryPage : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.onEvent(HistoryPageEvent.GetSearchHistory)
         viewBinding.rvHspList.apply {
-            adapter = HistoryPageAdapter(mutableListOf())
+            adapter = HistoryPageAdapter(mutableListOf()){ productId ->
+                val bundle = Bundle().apply {
+                    putString(getString(R.string.productId), productId)
+                }
+                findNavController().navigate(R.id.action_history_page_to_product_details_page, bundle)
+            }
             layoutManager = LinearLayoutManager(requireContext())
         }
 
@@ -42,8 +51,8 @@ class HistoryPage : Fragment() {
                     when(state.searchHistoryFetchState){
                         Status.LOADING -> {}
                         Status.SUCCESS -> {
-                            val adapter = viewBinding.rvHspList.adapter as SearchHistoryAdapter
-                            adapter.updateList(state.searchHistory)
+                            val adapter = viewBinding.rvHspList.adapter as HistoryPageAdapter
+                            adapter.updateData(state.searchHistory)
                         }
                         Status.FAILURE -> {
                             view.showSnackBar(state.errorMessage.toString())
@@ -53,5 +62,20 @@ class HistoryPage : Fragment() {
                 }
             }
         }
+
+        viewBinding.svHspSearch.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+            override fun onQueryTextChange(newText: String?): Boolean {
+                newText?.let {
+                    (viewBinding.rvHspList.adapter as HistoryPageAdapter).filter(it)
+                }
+                return true
+            }
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+        })
+
     }
 }

@@ -16,17 +16,19 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import com.mdev1008.nutriscanandroiddev.R
 import com.mdev1008.nutriscanandroiddev.databinding.FragmentScanPageBinding
 import com.mdev1008.nutriscanandroiddev.domain.model.ScanItemForView
 import com.mdev1008.nutriscanandroiddev.utils.Status
 import com.mdev1008.nutriscanandroiddev.utils.errorLogger
 import com.mdev1008.nutriscanandroiddev.utils.infoLogger
 import com.mdev1008.nutriscanandroiddev.utils.showSnackBar
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
@@ -46,9 +48,14 @@ class ScanPage : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.onEvent(ScanPageEvent.ClearScanList)
         viewBinding.rvScanList.apply {
-            adapter = ScanListAdapter(emptyList()){
-                //TODO: Navigate to Product Details Page
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = ScanListAdapter(emptyList()){ productId ->
+                val bundle = Bundle().apply {
+                    putString(getString(R.string.productId), productId)
+                }
+                findNavController().navigate(R.id.action_scan_page_to_product_details_page, bundle)
             }
         }
         buildCameraPreview()
@@ -60,8 +67,8 @@ class ScanPage : Fragment() {
                             infoLogger("ScanPage: Loading Product Details")
                         }
                         Status.SUCCESS -> {
-                            val newItem = state.scanList.last()
-                            updateRecyclerView(newItem)
+                            view.showSnackBar("Product found: ${state.scanList.last().productName}")
+                            updateRecyclerView(state.scanList)
                         }
                         Status.FAILURE -> {
                             view.showSnackBar(state.errorMessage.toString())
@@ -86,7 +93,7 @@ class ScanPage : Fragment() {
             )
             .build()
         val products = mutableMapOf<String, Int>()
-        val framesCount = 60
+        val framesCount = 30
         val barcodeScanner = BarcodeScanning.getClient(options)
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
@@ -139,8 +146,8 @@ class ScanPage : Fragment() {
     }
 
 
-    private fun updateRecyclerView(newItem: ScanItemForView){
+    private fun updateRecyclerView(newList: List<ScanItemForView>){
         val adapter = viewBinding.rvScanList.adapter as ScanListAdapter
-        adapter.addItem(newItem)
+        adapter.updateList(newList)
     }
 }

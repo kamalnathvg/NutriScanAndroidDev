@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cl_hsp_item_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cv_hsp_item"
@@ -13,6 +13,7 @@
         android:layout_margin="8dp"
         android:elevation="8dp"
         app:cardCornerRadius="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -23,13 +24,13 @@
 
             <ImageView
                 android:id="@+id/iv_hsp_product_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@id/tv_hsp_product_name"
+                app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintHorizontal_bias="0"
                 tools:srcCompat="@tools:sample/avatars" />
 
             <TextView
@@ -73,11 +74,11 @@
                 android:id="@+id/iv_hsp_health_category"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/tv_hsp_last_scanned"
                 app:layout_constraintTop_toBottomOf="@id/tv_hsp_brand"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginEnd="8dp"
                 tools:srcCompat="@tools:sample/avatars" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

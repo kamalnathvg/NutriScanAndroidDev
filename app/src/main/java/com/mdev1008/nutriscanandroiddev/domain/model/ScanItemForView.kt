@@ -10,21 +10,23 @@ data class ScanItemForView(
     val productBrand: String,
     val imageUrl: String,
     val healthCategory: HealthCategory,
-    val additivesCount: Int,
-    val allergenCount: Int,
+    val additivesCount: String,
+    val allergenCount: String,
 )
 
 
 
 fun Product.toScanItemForView(): ScanItemForView{
     val healthCategory = this.nutriScoreGrade.getHealthCategory()
+    val additivesCount = this.additivesTags?.size ?: "Unknown"
+    val allergenCount = this.allergensHierarchy?.size ?: "Unknown"
     return ScanItemForView(
         productId = this.productId,
         productName = this.productName,
         productBrand = this.brand ?: "Unknown",
         imageUrl = this.imageUrl ?: "",
         healthCategory = healthCategory,
-        additivesCount = 5, //TODO: Needs to be fixed
-        allergenCount = 3 //TODO: Needs to be fixed
+        additivesCount = "Additives: $additivesCount", //TODO: Needs to be fixed
+        allergenCount = "Allergens: $allergenCount" //TODO: Needs to be fixed
     )
 }

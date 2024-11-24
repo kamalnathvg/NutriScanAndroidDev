@@ -21,7 +21,9 @@ import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.mdev1008.nutriscanandroiddev.R
 import com.mdev1008.nutriscanandroiddev.databinding.FragmentProfilePageBinding
@@ -39,6 +41,7 @@ import com.mdev1008.nutriscanandroiddev.data.model.getPreference
 import com.mdev1008.nutriscanandroiddev.data.model.removeAllergen
 import com.mdev1008.nutriscanandroiddev.data.model.removeRestriction
 import com.mdev1008.nutriscanandroiddev.data.model.upsertPreference
+import com.mdev1008.nutriscanandroiddev.utils.Status
 import com.mdev1008.nutriscanandroiddev.utils.hide
 import com.mdev1008.nutriscanandroiddev.utils.isValidUserName
 import com.mdev1008.nutriscanandroiddev.utils.debugLogger
@@ -50,8 +53,7 @@ import kotlinx.coroutines.launch
 
 class ProfilePage : Fragment() {
 
-
-    private lateinit var mainViewBinding: FragmentProfilePageBinding
+    private lateinit var viewBinding: FragmentProfilePageBinding
     private lateinit var dietaryPreference:  MutableList<UserDietaryPreference>
     private lateinit var dietaryRestriction:  MutableList<UserDietaryRestriction>
     private lateinit var allergens:  MutableList<UserAllergen>
@@ -63,29 +65,46 @@ class ProfilePage : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val state = viewModel.uiState.value
-        mainViewBinding = FragmentProfilePageBinding.inflate(inflater, container, false)
-        state.userProfileDetails.let { userProfileDetails ->
-            dietaryPreference = userProfileDetails?.userPreferences?.toMutableList() ?: mutableListOf()
-            dietaryRestriction = userProfileDetails?.userRestrictions?.toMutableList() ?: mutableListOf()
-            allergens = userProfileDetails?.userAllergen?.toMutableList() ?: mutableListOf()
-        }
-        return mainViewBinding.root
+        viewBinding = FragmentProfilePageBinding.inflate(inflater, container, false)
+       return viewBinding.root
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.onEvent(ProfilePageEvent.GetUserDetails)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+                viewModel.uiState.collect{ state ->
+                    when(state.userDetailsFetchState){
+                        Status.LOADING -> {
 
-        prefillTextField()
+                        }
+                        Status.SUCCESS -> {
+                            state.userProfileDetails.let { userProfileDetails ->
+                                dietaryPreference = userProfileDetails?.userPreferences?.toMutableList() ?: mutableListOf()
+                                dietaryRestriction = userProfileDetails?.userRestrictions?.toMutableList() ?: mutableListOf()
+                                allergens = userProfileDetails?.userAllergen?.toMutableList() ?: mutableListOf()
+                            }
+                            prefillTextField()
+                            buildDietaryPreferenceView()
+                            buildDietaryRestrictionView()
+                            buildAllergenView()
+                            setupSaveButton()
+                        }
+                        Status.FAILURE -> {
+                            view.showSnackBar(state.errorMessage.toString())
+                        }
+                        Status.IDLE -> {}
+                    }
+                }
+            }
+        }
         setUpToolbar()
-        buildDietaryPreferenceView()
-        buildDietaryRestrictionView()
-        buildAllergenView()
-        setupSaveButton()
+
     }
 
     private fun setUpToolbar() {
         val appCompatActivity = activity as AppCompatActivity
-        mainViewBinding.mtbProfilePage.let { materialToolbar ->
+        viewBinding.mtbProfilePage.let { materialToolbar ->
             appCompatActivity.setSupportActionBar(materialToolbar)
             materialToolbar.title = getString(R.string.profile_page)
             materialToolbar.setTitleTextColor(Color.WHITE)
@@ -112,15 +131,15 @@ class ProfilePage : Fragment() {
 
     private fun prefillTextField() {
         viewModel.uiState.value.userProfileDetails?.userDetails?.let {
-            mainViewBinding.tiUsernameEditText.setText(it.userName)
+            viewBinding.tiUsernameEditText.setText(it.userName)
         }
     }
 
     private fun setupSaveButton() {
         val currentUserDetails = viewModel.uiState.value.userProfileDetails
-        mainViewBinding.btnSaveUserDetails.setOnClickListener {
+        viewBinding.btnSaveUserDetails.setOnClickListener {
             debugLogger("dietary Preference: $dietaryPreference")
-            val userName = mainViewBinding.tiUsernameEditText.text.toString()
+            val userName = viewBinding.tiUsernameEditText.text.toString()
             val uid = currentUserDetails?.userDetails?.id
             if (userName.isValidUserName().first && uid != null){
                 currentUserDetails.userDetails.let { user ->
@@ -147,7 +166,7 @@ class ProfilePage : Fragment() {
 
     private fun buildAllergenView() {
         val userProfileDetails = viewModel.uiState.value.userProfileDetails
-        mainViewBinding.apply {
+        viewBinding.apply {
             llAllergenHeaderLayout.setOnClickListener {
                 debugLogger("clicked allergen header")
                 toggleLayout(clAllergenCollapsable, ivAllergenExpandCollapse)
@@ -189,18 +208,18 @@ class ProfilePage : Fragment() {
                     }
                 }
             }
-            val buttonIds =  mainViewBinding.flAllergenLayout.referencedIds.toMutableList()
+            val buttonIds =  viewBinding.flAllergenLayout.referencedIds.toMutableList()
             buttonIds.add(button.id)
-            mainViewBinding.flAllergenLayout.referencedIds = buttonIds.toIntArray()
+            viewBinding.flAllergenLayout.referencedIds = buttonIds.toIntArray()
 
             Log.d("logger", "adding ${allergen.heading} button to layout")
-            mainViewBinding.clAllergenCollapsable.addView(button)
+            viewBinding.clAllergenCollapsable.addView(button)
         }
     }
 
     private fun buildDietaryRestrictionView() {
         val userProfileDetails = viewModel.uiState.value.userProfileDetails
-        mainViewBinding.apply {
+        viewBinding.apply {
             llDietaryRestrictionHeader.setOnClickListener {
                 infoLogger("clicked restriction header")
                 toggleLayout(clCollapsableDietaryRestriction, ivDietaryRestrictionExpandCollapse)
@@ -242,27 +261,27 @@ class ProfilePage : Fragment() {
                 }
 //                background = ContextCompat.getDrawable(requireContext(),R.color.md_theme_primary)
             }
-            val buttonIds = mainViewBinding.flDietaryRestrictionCollapsableLayout.referencedIds.toMutableList()
+            val buttonIds = viewBinding.flDietaryRestrictionCollapsableLayout.referencedIds.toMutableList()
             buttonIds.add(button.id)
-            mainViewBinding.flDietaryRestrictionCollapsableLayout.referencedIds = buttonIds.toIntArray()
+            viewBinding.flDietaryRestrictionCollapsableLayout.referencedIds = buttonIds.toIntArray()
 
 
             Log.d("logger", "adding ${restriction.heading} button to layout")
-            mainViewBinding.clCollapsableDietaryRestriction.addView(button)
+            viewBinding.clCollapsableDietaryRestriction.addView(button)
         }
 
     }
 
     private fun buildDietaryPreferenceView() {
         val userId = viewModel.uiState.value.userProfileDetails?.userDetails?.id
-        mainViewBinding.apply {
+        viewBinding.apply {
             llDietaryPreferenceHeader.setOnClickListener{
                 infoLogger("clicked preference header")
                 toggleLayout(clDietaryPreferenceCollapsable, ivDietaryPreferenceExpandCollapse)
             }
         }
         NutrientType.entries.forEach{ nutrient ->
-            val itemView = LayoutInflater.from(requireContext()).inflate(R.layout.component_pp_nutrient_radio_group,mainViewBinding.nutrientsCollapsableLayout,false)
+            val itemView = LayoutInflater.from(requireContext()).inflate(R.layout.component_pp_nutrient_radio_group,viewBinding.nutrientsCollapsableLayout,false)
             val tvNutrientName = itemView.findViewById<TextView>(R.id.tv_rg_nutrient_name)
             val rgNutrientGroup = itemView.findViewById<RadioGroup>(R.id.rg_nutrient_preference)
             val rbNutrientLow = itemView.findViewById<RadioButton>(R.id.rb_nutrient_low)
@@ -321,7 +340,7 @@ class ProfilePage : Fragment() {
                 true
             }
 
-            mainViewBinding.nutrientsCollapsableLayout.addView(itemView)
+            viewBinding.nutrientsCollapsableLayout.addView(itemView)
 
         }
     }
@@ -330,9 +349,9 @@ class ProfilePage : Fragment() {
     private fun toggleLayout(layout: ConstraintLayout, iconView: ImageView){
         infoLogger("toggling $layout")
         val headers = mutableListOf(
-            Pair(mainViewBinding.clDietaryPreferenceCollapsable,mainViewBinding.ivDietaryPreferenceExpandCollapse),
-            Pair(mainViewBinding.clCollapsableDietaryRestriction,mainViewBinding.ivDietaryRestrictionExpandCollapse),
-            Pair(mainViewBinding.clAllergenCollapsable,mainViewBinding.ivAllergenExpandCollapse)
+            Pair(viewBinding.clDietaryPreferenceCollapsable,viewBinding.ivDietaryPreferenceExpandCollapse),
+            Pair(viewBinding.clCollapsableDietaryRestriction,viewBinding.ivDietaryRestrictionExpandCollapse),
+            Pair(viewBinding.clAllergenCollapsable,viewBinding.ivAllergenExpandCollapse)
         )
 
         if (layout.isVisible){

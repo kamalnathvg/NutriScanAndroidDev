@@ -71,7 +71,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
 
     implementation ("com.github.bumptech.glide:glide:4.12.0")
-    kapt("com.github.bumptech.glide:compiler:4.12.0")
+    ksp("com.github.bumptech.glide:compiler:4.12.0")
 
     implementation("androidx.room:room-runtime:2.6.0")
     annotationProcessor("androidx.room:room-compiler:2.6.0")

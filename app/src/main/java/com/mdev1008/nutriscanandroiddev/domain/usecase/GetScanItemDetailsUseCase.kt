@@ -1,6 +1,8 @@
 package com.mdev1008.nutriscanandroiddev.domain.usecase
 
+import com.mdev1008.nutriscanandroiddev.data.model.toSearchHistoryItem
 import com.mdev1008.nutriscanandroiddev.data.repository.ApiRepository
+import com.mdev1008.nutriscanandroiddev.data.repository.DbRepository
 import com.mdev1008.nutriscanandroiddev.domain.model.ScanItemForView
 import com.mdev1008.nutriscanandroiddev.domain.model.toProductDetailsForView
 import com.mdev1008.nutriscanandroiddev.domain.model.toScanItemForView
@@ -13,7 +15,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
 class GetScanItemDetailsUseCase(
-    private val apiRepository: ApiRepository
+    private val apiRepository: ApiRepository,
+    private val dbRepository: DbRepository
 ) {
     operator fun invoke(productId: String): Flow<Resource<ScanItemForView>> = flow {
         emit(Resource.Loading())
@@ -22,6 +25,8 @@ class GetScanItemDetailsUseCase(
             emit(Resource.Failure(result.message))
             return@flow
         }
+
+        dbRepository.addItemToSearchHistory(result.data.toSearchHistoryItem(userId = 0))
         val scanItem = result.data.toScanItemForView()
         emit(Resource.Success(scanItem))
     }

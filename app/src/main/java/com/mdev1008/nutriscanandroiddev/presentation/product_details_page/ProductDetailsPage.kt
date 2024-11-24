@@ -24,6 +24,7 @@ import com.mdev1008.nutriscanandroiddev.utils.getIcon
 import com.mdev1008.nutriscanandroiddev.utils.getIconAndBg
 import com.mdev1008.nutriscanandroiddev.utils.infoLogger
 import com.mdev1008.nutriscanandroiddev.utils.loadFromUrlOrGone
+import com.mdev1008.nutriscanandroiddev.utils.showSnackBar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -52,7 +53,7 @@ class ProductDetailsPage : Fragment() {
         viewBindingLayout.mtbProductDetailsPage.title = getString(R.string.product_details)
         viewBindingLayout.mtbProductDetailsPage.setTitleTextColor(Color.WHITE)
 
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState.collect{ state ->
                 when(state.productDetailsFetchState){
                     Status.LOADING -> {
@@ -63,8 +64,10 @@ class ProductDetailsPage : Fragment() {
                             buildProductDetailsUi(it)
                         }
                     }
-                    Status.FAILURE -> TODO()
-                    Status.IDLE -> TODO()
+                    Status.FAILURE -> {
+                        view.showSnackBar(state.errorMessage.toString())
+                    }
+                    Status.IDLE -> {}
                 }
             }
         }

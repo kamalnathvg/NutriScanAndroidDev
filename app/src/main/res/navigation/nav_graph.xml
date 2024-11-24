@@ -52,7 +52,9 @@
         android:name="com.mdev1008.nutriscanandroiddev.presentation.history_page.HistoryPage"
         android:label="HistoryPage"
         tools:layout="@layout/fragment_history_page">
-
+        <action
+            android:id="@+id/action_history_page_to_product_details_page"
+            app:destination="@id/product_details_page"/>
     </fragment>
     <fragment
         android:id="@+id/profile_page"
@@ -70,7 +72,7 @@
         android:label="ScanPage"
         tools:layout="@layout/fragment_scan_page">
         <action
-            android:id="@+id/action_scan_page_to_productDetails_page"
+            android:id="@+id/action_scan_page_to_product_details_page"
             app:destination="@id/product_details_page"/>
     </fragment>
 
@@ -79,6 +81,9 @@
         android:name="com.mdev1008.nutriscanandroiddev.presentation.product_details_page.ProductDetailsPage"
         android:label="ProductDetailsPage"
         tools:layout="@layout/fragment_product_details_page">
+        <argument
+            android:name="@string/productId"
+            app:argType="string"/>
     </fragment>
 
 </navigation>

@@ -33,10 +33,19 @@ class ScanPageViewModel(
     fun onEvent(event: ScanPageEvent){
         when(event){
             is ScanPageEvent.GetProductDetailsById -> getProductDetailsById(event.productId)
+            is ScanPageEvent.ClearScanList -> clearScanList()
         }
     }
 
+    private fun clearScanList() {
+        _uiState.update { ScanPageState() }
+    }
+
     private fun getProductDetailsById(productId: String) {
+        val currentList = uiState.value.scanList
+        if (currentList.any { it.productId == productId }){
+            return
+        }
         getScanItemDetailsUseCase(productId).onEach { result ->
             when(result){
                 is Resource.Failure -> {
@@ -88,8 +97,9 @@ class ScanPageViewModel(
                 if (modelClass.isAssignableFrom(ScanPageViewModel::class.java)){
                     val application = checkNotNull(extras[APPLICATION_KEY])
                     val apiRepository = (application as NutriScanApplication).apiRepository
+                    val dbRepository = application.dbRepository
                     return ScanPageViewModel(
-                        getScanItemDetailsUseCase = GetScanItemDetailsUseCase(apiRepository)
+                        getScanItemDetailsUseCase = GetScanItemDetailsUseCase(apiRepository, dbRepository)
                     ) as T
                 }
                 throw IllegalArgumentException("Invalid ViewModel class")

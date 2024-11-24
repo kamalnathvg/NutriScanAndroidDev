@@ -16,7 +16,7 @@ import com.mdev1008.nutriscanandroiddev.utils.infoLogger
 import com.mdev1008.nutriscanandroiddev.utils.loadFromUrlOrGone
 import com.mdev1008.nutriscanandroiddev.utils.toReadableString
 
-class HistoryPageAdapter(private var searchHistory: List<SearchHistoryItemForView>) :
+class HistoryPageAdapter(private var searchHistory: List<SearchHistoryItemForView>, private val callback: (productId: String) -> Unit) :
     RecyclerView.Adapter<HistoryPageAdapter.HistoryPageViewHolder>() {
     private var filteredList: List<SearchHistoryItemForView> = searchHistory
 
@@ -49,6 +49,9 @@ class HistoryPageAdapter(private var searchHistory: List<SearchHistoryItemForVie
             tvProductLastScanned.text = item.lastScanned.getDurationTillNow().toReadableString()
             val (icon, _) = item.healthCategory.getIconAndBg(ivHealthCategory.context)
             ivHealthCategory.setImageResource(icon)
+            cvProduct.setOnClickListener {
+                callback(item.productId)
+            }
         }
     }
 

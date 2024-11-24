@@ -58,4 +58,8 @@ class ScanListAdapter(private var scanList: List<ScanItemForView>,private val ca
         this.scanList.toMutableList().add(item)
         notifyItemInserted(this.scanList.size)
     }
+    fun updateList(newList: List<ScanItemForView>){
+        this.scanList = newList
+        notifyDataSetChanged()
+    }
 }
