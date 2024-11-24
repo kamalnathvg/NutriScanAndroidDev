@@ -64,6 +64,15 @@
             app:destination="@id/home_page"
             />
     </fragment>
+    <fragment
+        android:id="@+id/scan_page"
+        android:name="com.mdev1008.nutriscanandroiddev.presentation.scan_page.ScanPage"
+        android:label="ScanPage"
+        tools:layout="@layout/fragment_scan_page">
+        <action
+            android:id="@+id/action_scan_page_to_productDetails_page"
+            app:destination="@id/product_details_page"/>
+    </fragment>
 
     <fragment
         android:id="@+id/product_details_page"

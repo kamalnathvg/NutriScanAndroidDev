@@ -23,3 +23,4 @@ fun SearchHistoryItem.toSearchHistoryForView(): SearchHistoryItemForView{
         lastScanned = this.timeStamp
     )
 }
+
