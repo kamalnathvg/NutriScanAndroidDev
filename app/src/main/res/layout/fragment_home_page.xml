@@ -121,7 +121,6 @@
         android:layout_height="wrap_content"
         tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         tools:spanCount="2"
-        android:orientation="vertical"
         tools:itemCount="4"
         tools:listitem="@layout/component_hmp_recommended_item"
         tools:visibility="visible" />

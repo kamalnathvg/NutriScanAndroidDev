@@ -1,5 +1,6 @@
 package com.mdev1008.nutriscanandroiddev.data.repository
 
+import android.util.Log
 import com.mdev1008.nutriscanandroiddev.data.model.Product
 import com.google.gson.GsonBuilder
 import com.mdev1008.nutriscanandroiddev.data.ApiRequests
@@ -71,13 +72,23 @@ class ApiRepository {
         dietaryRestrictions: List<DietaryRestriction>,
         allergens: List<Allergen>
     ): RecommendedProductsResponseDto?{
-        val categories = category[0]
+        val allergensTags = allergens.joinToString(",") { allergen ->
+            "-${allergen.allergenStrings[0].replace(":",":")}"
+        }
+        Log.d("logger",allergensTags)
+        val ingredientAnalysisTags = dietaryRestrictions.joinToString(",") {
+            it.response
+        }
+        Log.d("logger",ingredientAnalysisTags)
+        val categoriesTags = category.filter { it.contains("en:") }.joinToString("|")
+        val defaultCategory = "snacks"
+        Log.d("logger", categoriesTags)
         val response = apiRequests.getRecommendedProducts(
             fields = AppResources.getRecommendedProductFields(),
-            categories = categories,
+            categories = defaultCategory,
             sortBy = "",
-            allergenTags = allergens.joinToString(",-") { it.allergenStrings.joinToString(",-") },
-            ingredientAnalysisTags = dietaryRestrictions.joinToString(",") { it.response }
+            allergenTags = allergensTags,
+            ingredientAnalysisTags = ingredientAnalysisTags
         ).execute()
         return response.body()
 
