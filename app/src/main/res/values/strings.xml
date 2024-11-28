@@ -14,4 +14,6 @@
     <string name="no_nutrient_details_available_for_the_product">No Nutrient Details Available for the Product :(</string>
     <string name="profile_page">Profile Page</string>
     <string name="productId">productId</string>
+    <string name="recommended_products">Recommended Products</string>
+    <string name="recents">Recents</string>
 </resources>

@@ -47,37 +47,36 @@
         app:layout_constraintStart_toEndOf="@+id/iv_product_image"
         app:layout_constraintTop_toBottomOf="@+id/tv_product_name" />
 
-    <TextView
-        android:id="@+id/tv_dietary_preference_conclusion"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/cv_product_health"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/iv_product_image"
-        app:layout_constraintTop_toBottomOf="@+id/tv_allergen_conclusion" />
+    <ImageView
+        android:id="@+id/iv_pdp_palm_oil_status"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toTopOf="@id/cv_product_health"
+        app:layout_constraintEnd_toStartOf="@id/iv_pdp_vegan_status"
+        app:layout_constraintStart_toEndOf="@id/iv_product_image"
+        tools:srcCompat="@tools:sample/avatars" />
 
-    <TextView
-        android:id="@+id/tv_dietary_restriction_conclusion"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/tv_allergen_conclusion"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/iv_product_image"
-        app:layout_constraintTop_toBottomOf="@+id/tv_product_brand" />
+    <ImageView
+        android:id="@+id/iv_pdp_vegan_status"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toTopOf="@id/cv_product_health"
+        app:layout_constraintEnd_toStartOf="@id/iv_pdp_vegetarian_status"
+        app:layout_constraintStart_toEndOf="@id/iv_pdp_palm_oil_status"
+        tools:srcCompat="@tools:sample/avatars" />
 
-    <TextView
-        android:id="@+id/tv_allergen_conclusion"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/tv_dietary_preference_conclusion"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/iv_product_image"
-        app:layout_constraintTop_toBottomOf="@+id/tv_dietary_restriction_conclusion" />
+    <ImageView
+        android:id="@+id/iv_pdp_vegetarian_status"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toTopOf="@id/cv_product_health"
+        app:layout_constraintStart_toEndOf="@id/iv_pdp_vegan_status"
+        tools:srcCompat="@tools:sample/avatars" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cv_product_health"

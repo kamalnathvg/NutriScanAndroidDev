@@ -4,18 +4,27 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.intl.Locale
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mdev1008.nutriscanandroiddev.R
+import com.mdev1008.nutriscanandroiddev.data.model.DietaryRestriction
 import com.mdev1008.nutriscanandroiddev.data.model.UserProfileDetails
+import com.mdev1008.nutriscanandroiddev.data.model.getPalmOilStatus
+import com.mdev1008.nutriscanandroiddev.data.model.getVeganStatus
+import com.mdev1008.nutriscanandroiddev.data.model.getVegetarianStatus
 import com.mdev1008.nutriscanandroiddev.databinding.FragmentHomePageBinding
 import com.mdev1008.nutriscanandroiddev.domain.model.RecommendedProductForView
 import com.mdev1008.nutriscanandroiddev.domain.model.SearchHistoryItemForView
 import com.mdev1008.nutriscanandroiddev.utils.Status
+import com.mdev1008.nutriscanandroiddev.utils.getIcon
 import com.mdev1008.nutriscanandroiddev.utils.infoLogger
 import com.mdev1008.nutriscanandroiddev.utils.showSnackBar
 import kotlinx.coroutines.launch
@@ -37,16 +46,21 @@ class HomePage : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (viewModel.uiState.value.userProfileDetails == null){
-            viewModel.emit(HomePageEvent.GetUserDetails)
-        }
+        viewModel.emit(HomePageEvent.GetUserDetails)
+        viewModel.emit(HomePageEvent.GetSearchHistory)
         viewBinding.apply {
-            rvHpSearchHistory.adapter = SearchHistoryAdapter(emptyList()){
-                //TODO: Navigate to product details page
+            rvHpSearchHistory.adapter = SearchHistoryAdapter(emptyList()){ productId ->
+                val bundle = Bundle().apply {
+                    putString(getString(R.string.productId), productId)
+                }
+                findNavController().navigate(R.id.action_home_page_to_product_details_page, bundle)
             }
             rvHpSearchHistory.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-            rvRecommendedProduct.adapter = RecommendedProductAdapter(emptyList()){
-                //TODO: Navigate to product details page
+            rvRecommendedProduct.adapter = RecommendedProductAdapter(emptyList()){ productId ->
+                val bundle = Bundle().apply {
+                    putString(getString(R.string.productId), productId)
+                }
+                findNavController().navigate(R.id.action_home_page_to_product_details_page, bundle)
             }
             rvRecommendedProduct.layoutManager = GridLayoutManager(requireContext(), 2)
         }
@@ -87,6 +101,7 @@ class HomePage : Fragment() {
                         }
                         Status.SUCCESS -> {
                             updateSearchHistory(state.searchHistory)
+                            infoLogger("searchHistory has ${state.searchHistory.size} items")
                         }
                         Status.FAILURE -> {
                             view?.showSnackBar("Error fetching search history: ${state.errorMessage}")
@@ -123,8 +138,18 @@ class HomePage : Fragment() {
 
     private fun updateUserDetails(user: UserProfileDetails){
         viewBinding.apply {
-            tvHpUserName.text = user.userDetails.userName
-            //TODO: implement rest of dietary preferences and restrictions
+            val greeting = "Hello, ${user.userDetails.userName.capitalize(Locale.current)}"
+            tvHpUserName.text = greeting
+            val dietaryRestrictions = user.userRestrictions.map { it.dietaryRestriction }
+            val palmOilStatus = dietaryRestrictions.getPalmOilStatus()
+            val veganStatus = dietaryRestrictions.getVeganStatus()
+            val vegetarianStatus = dietaryRestrictions.getVegetarianStatus()
+            infoLogger(palmOilStatus.heading)
+            infoLogger(veganStatus.heading)
+            infoLogger(vegetarianStatus.heading)
+            ivHpUserPalmOil.setImageDrawable(palmOilStatus.getIcon(requireContext(), palmOilStatus != DietaryRestriction.PALM_OIL_STATUS_UNKNOWN))
+            ivHpUserVegan.setImageDrawable(veganStatus.getIcon(requireContext(), veganStatus != DietaryRestriction.VEGAN_STATUS_UNKNOWN))
+            ivHpUserVegetarian.setImageDrawable(vegetarianStatus.getIcon(requireContext(), vegetarianStatus != DietaryRestriction.VEGETARIAN_STATUS_UNKNOWN))
         }
     }
 

@@ -51,12 +51,18 @@ fun Product.getMainDetailsForView(): MainDetailsForView {
     val productName = this.productName
     val productBrand = this.brand
     val healthCategory = this.nutriScoreGrade.getHealthCategory()
+    val palmOilStatus = this.dietaryRestrictions?.toDietaryRestrictions()?.getPalmOilStatus() ?: DietaryRestriction.PALM_OIL_STATUS_UNKNOWN
+    val veganStatus = this.dietaryRestrictions?.toDietaryRestrictions()?.getVeganStatus() ?: DietaryRestriction.VEGAN_STATUS_UNKNOWN
+    val vegetarianStatus = this.dietaryRestrictions?.toDietaryRestrictions()?.getVegetarianStatus() ?: DietaryRestriction.VEGETARIAN_STATUS_UNKNOWN
 
     return  MainDetailsForView(
         productId = productId,
         imageUrl = imageUrl,
         productName = productName,
         productBrand = productBrand,
+        palmOilStatus = palmOilStatus,
+        veganStatus = veganStatus,
+        vegetarianStatus = vegetarianStatus,
         healthCategory = healthCategory
     )
 }

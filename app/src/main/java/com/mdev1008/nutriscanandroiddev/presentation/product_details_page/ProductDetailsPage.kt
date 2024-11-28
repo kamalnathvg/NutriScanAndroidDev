@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.mdev1008.nutriscanandroiddev.R
+import com.mdev1008.nutriscanandroiddev.data.model.DietaryRestriction
 import com.mdev1008.nutriscanandroiddev.data.model.NutrientCategory
 import com.mdev1008.nutriscanandroiddev.databinding.FragmentProductDetailsPageBinding
 import com.mdev1008.nutriscanandroiddev.domain.model.MainDetailsForView
@@ -25,7 +26,6 @@ import com.mdev1008.nutriscanandroiddev.utils.getIconAndBg
 import com.mdev1008.nutriscanandroiddev.utils.infoLogger
 import com.mdev1008.nutriscanandroiddev.utils.loadFromUrlOrGone
 import com.mdev1008.nutriscanandroiddev.utils.showSnackBar
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ProductDetailsPage : Fragment() {
@@ -126,15 +126,29 @@ class ProductDetailsPage : Fragment() {
     private fun buildMainHeaderView(mainDetailsForView: MainDetailsForView) {
 //        val conclusions = viewModel.uiState.value.userPreferencesConclusion
         val mainHeaderView = LayoutInflater.from(requireContext())
-
             .inflate(R.layout.component_pdp_main_details_view, viewBindingLayout.llProductDetailsLayout, false)
         mainHeaderView.findViewById<ImageView>(R.id.iv_product_image).loadFromUrlOrGone(mainDetailsForView.imageUrl)
         mainHeaderView.findViewById<TextView>(R.id.tv_product_name).text = mainDetailsForView.productName
         mainHeaderView.findViewById<TextView>(R.id.tv_product_brand).text = mainDetailsForView.productBrand
         mainHeaderView.findViewById<TextView>(R.id.tv_product_health_grade).text = mainDetailsForView.healthCategory.description
-//        mainHeaderView.findViewById<TextView>(R.id.tv_dietary_preference_conclusion).text = conclusions.userDietaryPreferenceConclusion
-//        mainHeaderView.findViewById<TextView>(R.id.tv_dietary_restriction_conclusion).text = conclusions.userDietaryRestrictionConclusion
-//        mainHeaderView.findViewById<TextView>(R.id.tv_allergen_conclusion).text = conclusions.userAllergenConclusion
+        mainHeaderView.findViewById<ImageView>(R.id.iv_pdp_palm_oil_status).setImageDrawable(
+            mainDetailsForView.palmOilStatus.getIcon(
+                requireContext(),
+                mainDetailsForView.palmOilStatus != DietaryRestriction.PALM_OIL_STATUS_UNKNOWN
+            )
+        )
+        mainHeaderView.findViewById<ImageView>(R.id.iv_pdp_vegan_status).setImageDrawable(
+            mainDetailsForView.veganStatus.getIcon(
+                requireContext(),
+                mainDetailsForView.veganStatus != DietaryRestriction.VEGAN_STATUS_UNKNOWN
+            )
+        )
+        mainHeaderView.findViewById<ImageView>(R.id.iv_pdp_vegetarian_status).setImageDrawable(
+            mainDetailsForView.vegetarianStatus.getIcon(
+                requireContext(),
+                mainDetailsForView.vegetarianStatus != DietaryRestriction.VEGETARIAN_STATUS_UNKNOWN
+            )
+        )
         val (healthCategoryIcon, cardBgColor) = mainDetailsForView.healthCategory.getIconAndBg(requireContext())
         mainHeaderView.findViewById<CardView>(R.id.cv_product_health).setCardBackgroundColor(cardBgColor)
         mainHeaderView.findViewById<ImageView>(R.id.iv_product_health_icon).setImageResource(healthCategoryIcon)

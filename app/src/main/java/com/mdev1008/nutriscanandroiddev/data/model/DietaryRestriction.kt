@@ -54,6 +54,20 @@ fun DietaryRestriction.isPalmOilRestriction(): Boolean{
     return this in restrictions
 }
 
+fun List<DietaryRestriction>.getVeganStatus(): DietaryRestriction{
+    return this.filter{ it.isVeganRestriction() }.getOrNull(0) ?: DietaryRestriction.VEGAN_STATUS_UNKNOWN
+}
+fun List<DietaryRestriction>.getVegetarianStatus(): DietaryRestriction{
+    return this.filter{ it.isVegetarianRestriction() }.getOrNull(0) ?: DietaryRestriction.VEGETARIAN_STATUS_UNKNOWN
+}
+fun List<DietaryRestriction>.getPalmOilStatus(): DietaryRestriction{
+    return this.filter{ it.isPalmOilRestriction() }.getOrNull(0) ?: DietaryRestriction.PALM_OIL_STATUS_UNKNOWN
+}
+
+
+
+
+
 fun DietaryRestriction.isSameCategory(dietaryRestriction: DietaryRestriction): Boolean{
     return (this.isVeganRestriction() && dietaryRestriction.isVeganRestriction())
             || (this.isVegetarianRestriction() && dietaryRestriction.isVegetarianRestriction())

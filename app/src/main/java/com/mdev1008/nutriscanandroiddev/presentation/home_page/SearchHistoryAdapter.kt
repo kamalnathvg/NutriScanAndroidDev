@@ -1,5 +1,6 @@
 package com.mdev1008.nutriscanandroiddev.presentation.home_page
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -21,16 +22,15 @@ class SearchHistoryAdapter(
     private val callback: (productId: String) -> Unit
 ) : RecyclerView.Adapter<SearchHistoryAdapter.SearchHistoryViewHolder>() {
     inner class SearchHistoryViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
-        val ivSearchHistoryImage : ImageView = itemView.findViewById(R.id.iv_hp_recommended_image)
-        val tvSearchHistoryName : TextView = itemView.findViewById(R.id.tv_hp_recommended_name)
-        val tvSearchHistoryBrand : TextView = itemView.findViewById(R.id.tv_hp_recommended_brand)
-        val tvTimeStamp : TextView = itemView.findViewById(R.id.tv_hp_search_history_timestamp)
-        val ivSearchHistoryHealthCategory : ImageView = itemView.findViewById(R.id.iv_hp_recommended_health_category)
-        val cvListItem: CardView = itemView.findViewById(R.id.cv_list_item)
+        val ivSearchHistoryImage : ImageView = itemView.findViewById(R.id.iv_hp_search_history_image)
+        val tvSearchHistoryName : TextView = itemView.findViewById(R.id.tv_hp_search_history_name)
+        val tvTimeStamp: TextView = itemView.findViewById(R.id.tv_hp_search_history_timestamp)
+        val ivSearchHistoryHealthCategory : ImageView = itemView.findViewById(R.id.iv_hp_search_history_health_category)
+        val cvListItem: CardView = itemView.findViewById(R.id.cv_hp_search_history)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchHistoryViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.component_hmp_recommended_item, parent,false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.component_hmp_history_item, parent,false)
         return  SearchHistoryViewHolder(view)
     }
 
@@ -43,7 +43,6 @@ class SearchHistoryAdapter(
         val (healthCategoryIcon, _) = getHealthCategoryIcon(context = holder.ivSearchHistoryHealthCategory.context, item.healthCategory)
         holder.apply {
             tvSearchHistoryName.text = item.productName
-            tvSearchHistoryBrand.text = item.productBrand
             tvTimeStamp.text = item.lastScanned.getDurationTillNow().toReadableString()
             ivSearchHistoryImage.loadFromUrlOrGone(item.imageUrl)
             ivSearchHistoryHealthCategory.setImageResource(healthCategoryIcon)
@@ -77,6 +76,7 @@ class SearchHistoryAdapter(
                 ))
         }
     }
+    @SuppressLint("NotifyDataSetChanged")
     fun updateList(newList: List<SearchHistoryItemForView>){
         this.searchHistoryItems = newList
         notifyDataSetChanged()
