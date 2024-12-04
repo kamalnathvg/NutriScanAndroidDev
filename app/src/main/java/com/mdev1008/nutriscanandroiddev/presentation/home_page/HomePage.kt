@@ -25,7 +25,9 @@ import com.mdev1008.nutriscanandroiddev.domain.model.RecommendedProductForView
 import com.mdev1008.nutriscanandroiddev.domain.model.SearchHistoryItemForView
 import com.mdev1008.nutriscanandroiddev.utils.Status
 import com.mdev1008.nutriscanandroiddev.utils.getIcon
+import com.mdev1008.nutriscanandroiddev.utils.hide
 import com.mdev1008.nutriscanandroiddev.utils.infoLogger
+import com.mdev1008.nutriscanandroiddev.utils.show
 import com.mdev1008.nutriscanandroiddev.utils.showSnackBar
 import kotlinx.coroutines.launch
 
@@ -154,6 +156,18 @@ class HomePage : Fragment() {
     }
 
     private fun updateSearchHistory(searchHistory: List<SearchHistoryItemForView>){
+        if (searchHistory.isEmpty()){
+            viewBinding.apply {
+                rvHpSearchHistory.hide()
+                tvRecentsMessage.text = getString(R.string.no_items_scanned_yet)
+                tvRecentsMessage.show()
+            }
+        }else{
+            viewBinding.apply {
+                rvHpSearchHistory.show()
+                tvRecentsMessage.hide()
+            }
+        }
         val adapter = viewBinding.rvHpSearchHistory.adapter as SearchHistoryAdapter
         adapter.updateList(searchHistory)
     }

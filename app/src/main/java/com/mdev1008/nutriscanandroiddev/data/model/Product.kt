@@ -1,4 +1,5 @@
 package com.mdev1008.nutriscanandroiddev.data.model
+import android.util.Log
 import com.google.gson.annotations.SerializedName
 import com.mdev1008.nutriscanandroiddev.domain.model.MainDetailsForView
 import com.mdev1008.nutriscanandroiddev.domain.model.NutrientForView
@@ -46,6 +47,7 @@ data class Product(
 
 
 fun Product.getMainDetailsForView(): MainDetailsForView {
+    Log.d("logger", "${this.allergensHierarchy}")
     val productId = this.productId
     val imageUrl = this.imageUrl ?: this.productId.getImageUrl()
     val productName = this.productName
@@ -54,6 +56,7 @@ fun Product.getMainDetailsForView(): MainDetailsForView {
     val palmOilStatus = this.dietaryRestrictions?.toDietaryRestrictions()?.getPalmOilStatus() ?: DietaryRestriction.PALM_OIL_STATUS_UNKNOWN
     val veganStatus = this.dietaryRestrictions?.toDietaryRestrictions()?.getVeganStatus() ?: DietaryRestriction.VEGAN_STATUS_UNKNOWN
     val vegetarianStatus = this.dietaryRestrictions?.toDietaryRestrictions()?.getVegetarianStatus() ?: DietaryRestriction.VEGETARIAN_STATUS_UNKNOWN
+    val allergens = this.allergensHierarchy?.toAllergens() ?: emptyList()
 
     return  MainDetailsForView(
         productId = productId,
@@ -63,7 +66,8 @@ fun Product.getMainDetailsForView(): MainDetailsForView {
         palmOilStatus = palmOilStatus,
         veganStatus = veganStatus,
         vegetarianStatus = vegetarianStatus,
-        healthCategory = healthCategory
+        healthCategory = healthCategory,
+        allergens = allergens
     )
 }
 fun Product.getNutrientsForView(): List<NutrientForView>{

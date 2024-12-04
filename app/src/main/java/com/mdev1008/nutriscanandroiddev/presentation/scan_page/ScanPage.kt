@@ -31,10 +31,39 @@ import com.mdev1008.nutriscanandroiddev.utils.infoLogger
 import com.mdev1008.nutriscanandroiddev.utils.showSnackBar
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.Settings
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
+import com.mdev1008.nutriscanandroiddev.MainActivity
 
 class ScanPage : Fragment() {
     private lateinit var viewBinding: FragmentScanPageBinding
     private val viewModel: ScanPageViewModel by activityViewModels<ScanPageViewModel> { ScanPageViewModel.Factory }
+    private val CAMERA_REQUEST_PERMISSION_CODE = 101
+
+    private val requestCameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){ isGranted ->
+        if (!isGranted){
+            view?.let {
+
+                val snackbar = Snackbar.make(it, "Camera Permission Required for Scanning Product", Snackbar.LENGTH_LONG)
+                snackbar.setAction("Change Permission"){
+                    if (isAdded){
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package","com.mdev1008.nutriscanandroiddev", null)
+                        }
+                        startActivity(intent)
+                        }
+                    }
+                snackbar.show()
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,7 +73,6 @@ class ScanPage : Fragment() {
         viewBinding = FragmentScanPageBinding.inflate(inflater, container, false)
         return viewBinding.root
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -58,6 +86,7 @@ class ScanPage : Fragment() {
                 findNavController().navigate(R.id.action_scan_page_to_product_details_page, bundle)
             }
         }
+        requestCameraPermission()
         buildCameraPreview()
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
@@ -81,7 +110,11 @@ class ScanPage : Fragment() {
         }
     }
 
-
+    private fun requestCameraPermission() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+            requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+       }
+    }
 
 
     @OptIn(ExperimentalGetImage::class)
@@ -96,6 +129,8 @@ class ScanPage : Fragment() {
         val framesCount = 30
         val barcodeScanner = BarcodeScanning.getClient(options)
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
+
+
 
         cameraProviderFuture.addListener({
           val cameraProvider = cameraProviderFuture.get()

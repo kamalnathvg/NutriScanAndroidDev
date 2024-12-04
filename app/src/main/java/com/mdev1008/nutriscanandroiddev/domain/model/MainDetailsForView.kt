@@ -1,5 +1,6 @@
 package com.mdev1008.nutriscanandroiddev.domain.model
 
+import com.mdev1008.nutriscanandroiddev.data.model.Allergen
 import com.mdev1008.nutriscanandroiddev.data.model.DietaryRestriction
 import com.mdev1008.nutriscanandroiddev.data.model.HealthCategory
 import com.mdev1008.nutriscanandroiddev.data.model.SearchHistoryItem
@@ -13,7 +14,8 @@ data class MainDetailsForView(
     val palmOilStatus: DietaryRestriction = DietaryRestriction.PALM_OIL_STATUS_UNKNOWN,
     val veganStatus: DietaryRestriction = DietaryRestriction.VEGAN_STATUS_UNKNOWN,
     val vegetarianStatus: DietaryRestriction = DietaryRestriction.VEGETARIAN_STATUS_UNKNOWN,
-    val healthCategory: HealthCategory = HealthCategory.UNKNOWN
+    val healthCategory: HealthCategory = HealthCategory.UNKNOWN,
+    val allergens: List<Allergen> = emptyList()
 )
 
 
