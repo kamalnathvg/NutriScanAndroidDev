@@ -23,8 +23,17 @@ class AppResources {
             "nutriscore_grade",
             "categories_hierarchy",
             "allergens_hierarchy",
+            "additives_original_tags",
             "ingredients_analysis_tags",
             )
+
+        private val RECOMMENDED_PRODUCT_FIELDS = listOf(
+            "product_name",
+            "code",
+            "image_url",
+            "nutriscore_grade",
+            "brands"
+        )
         private val ALLERGEN_FREE = listOf(
             "en:none" ,
             "en:allergens-free",
@@ -226,6 +235,9 @@ class AppResources {
         )
         fun getProductDetailsFields(): String{
             return PRODUCT_DETAILS_FIELDS.joinToString(",")
+        }
+        fun getRecommendedProductFields(): String{
+            return RECOMMENDED_PRODUCT_FIELDS.joinToString(",")
         }
     }
 }

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".pages.productdetailspage.ProductDetailsPage" >
+    tools:context=".presentation.product_details_page.ProductDetailsPage" >
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/mtb_product_details_page"

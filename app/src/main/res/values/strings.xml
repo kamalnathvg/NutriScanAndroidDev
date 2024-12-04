@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">NutriScanAndroidDev</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="register_page_title">Register</string>
     <string name="password_mismatch_message">Passwords don\'t match</string>
@@ -13,4 +12,8 @@
     <string name="homepage_title">Home Page</string>
     <string name="no_nutrient_details_available_for_the_product">No Nutrient Details Available for the Product :(</string>
     <string name="profile_page">Profile Page</string>
+    <string name="productId">productId</string>
+    <string name="recommended_products">Recommended Products</string>
+    <string name="recents">Recents</string>
+    <string name="no_items_scanned_yet">No Items Scanned Yet.</string>
 </resources>
